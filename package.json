@@ -1,0 +1,38 @@
+{
+  "name": "paco-backend-graph-api",
+  "version": "1.0.0",
+  "description": "REST-API between Frontend and Graph Database",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/harcis-dev/paco-backend-graph-api.git"
+  },
+  "keywords": [
+    "harcis",
+    "paco",
+    "epk",
+    "bpmn",
+    "graph"
+  ],
+  "author": "harcis",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/harcis-dev/paco-backend-graph-api/issues"
+  },
+  "homepage": "https://github.com/harcis-dev/paco-backend-graph-api#readme",
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "nodemon": "^2.0.13",
+    "pretier": "0.0.1"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "mongodb": "^4.1.3"
+  }
+}
