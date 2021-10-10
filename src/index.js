@@ -24,7 +24,7 @@ app.listen(port, () => {
 });
 
 app.get("/graph", (request, response) => {
-    collection.find({"_id": `${request.query.id}`}).toArray((error, result) => {
+    collection.findOne({"_id": `${request.query.id}`},(error, result) => {
         if (error) {
             return response.status(500).send(error);
         }
