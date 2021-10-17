@@ -1,0 +1,7 @@
+README.md
+Dockerfile
+.dockerignore
+node_modules/
+logs/
+scripts/
+package-lock.json
