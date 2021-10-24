@@ -1,6 +1,5 @@
 function isEmptyObject(obj) {
-  let t = !(Object.keys(obj).length === 0);
-  return t;
+  return (Object.keys(obj).length === 0);
   }
 
 module.exports = isEmptyObject;
