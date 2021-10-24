@@ -1,26 +1,36 @@
 const isEmptyObject = require("../json/jsonEmpty.js")
 
 function filterVariants(graphJSON, variants) {
-    if (isEmptyObject(variants)) {
-        filterVariantsConrete(graphJSON.dfg, variants);
-        filterVariantsConrete(graphJSON.epc, variants);
-        filterVariantsConrete(graphJSON.bpmn, variants);
-    }
+    let isVariantsEmpty = isEmptyObject(variants);
+    filterVariantsConrete(graphJSON.dfg.graph, graphJSON.dfg.frequency, variants, isVariantsEmpty);
+    filterVariantsConrete(graphJSON.epc.graph, graphJSON.dfg.frequency, variants, isVariantsEmpty);
+    filterVariantsConrete(graphJSON.bpmn.graph, graphJSON.dfg.frequency, variants, isVariantsEmpty);
+
     return graphJSON
 }
 
 function arrayEquals(target, variants) {
     return target.some(v => variants.includes(v));
 }
-function filterVariantsConrete(graphJSONconcrete, variants) {
+
+function filterVariantsConrete(graphJSONconcrete, frequency, variants, isVariantsEmpty) {
     for (var i = 0; i < graphJSONconcrete.length; i++) {
-        if (!(arrayEquals(graphJSONconcrete[i].data.variants, variants))) {
+        let sum = 0;
+        let graphData = graphJSONconcrete[i].data
+        let graphVariants = graphData.variants;
+        if (!(arrayEquals(graphVariants, variants)) && !isVariantsEmpty) {
             graphJSONconcrete.splice(i, 1);
             i--;
+            continue;
         }
-        //delete graphJSONconcrete[i].data.variants
+        for (const [key, value] of Object.entries(frequency)) {
+            if (variants.includes(key)) {
+                sum += value;
+            }
+        }
+        graphData.label = `${graphData.label} \n ${sum}`
+        //delete graphVariants
     }
 }
-
 
 module.exports = filterVariants;
