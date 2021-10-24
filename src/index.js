@@ -55,8 +55,8 @@ app.listen(process.env.SERVER_PORT, () => {
         logger.info(`Connected to Database: ${mongodbName}.`);
     });
 });
-
-app.get("/graph", (request, response) => {
+//Get graph, filter with variants in request body
+app.post("/graph/variants", (request, response) => {
     let query = {"_id": `${request.query.id}`}
     collection.findOne(query,(error, result) => {
         if (error) {
@@ -64,10 +64,11 @@ app.get("/graph", (request, response) => {
             return response.status(500).send(error);
         }
         logger.debug(`findOne: ${result}`);    
-        response.send(filterVariants(result, request.body));
+        response.send(filterVariants(result, request.body.variants));
     });
 });
 
+//Insert graph if not exist, Replace graph if exist
 app.post("/graph", (request, response) => {
     collection.replaceOne({"_id": `${jsonParser(request.body, "_id")}`}, request.body,{upsert: true}, (error, result) => {
         if (error) {
