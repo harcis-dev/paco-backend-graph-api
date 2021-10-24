@@ -12,6 +12,7 @@ const mongodbName = 'graph';
 
 const bodyParser = require('body-parser');
 const jsonParser = require("./utils/json/jsonParser.js")
+const filterVariants = require("./utils/variants/filterVariants.js")
 
 const nodeEnv = process.env.NODE_ENV || 'development';
 
@@ -56,13 +57,14 @@ app.listen(process.env.SERVER_PORT, () => {
 });
 
 app.get("/graph", (request, response) => {
-    collection.findOne({"_id": `${request.query.id}`},(error, result) => {
+    let query = {"_id": `${request.query.id}`}
+    collection.findOne(query,(error, result) => {
         if (error) {
             logger.error(`${error}`);
             return response.status(500).send(error);
         }
-        logger.debug(`findOne: ${result}`);
-        response.send(result);
+        logger.debug(`findOne: ${result}`);    
+        response.send(filterVariants(result, request.body));
     });
 });
 
