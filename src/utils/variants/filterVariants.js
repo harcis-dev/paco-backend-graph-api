@@ -1,7 +1,8 @@
 const isEmptyObject = require("../json/jsonEmpty.js")
 
+
 function filterVariants(graphJSON, variantsReq, sequenceReq) {
-    filterConreteGraph(graphJSON.dfg.graph, variantsReq, sequenceReq);
+    filterConreteGraph(graphJSON["dfg"]["graph"], variantsReq, sequenceReq);
     //filterVariantsConrete(graphJSON.epc.graph, variants); // TODO
     //filterVariantsConrete(graphJSON.bpmn.graph, variants); // TODO
 
@@ -34,7 +35,11 @@ function filterConreteGraph(graphJSONconcrete, variantsReq, sequenceReq) {
                     sum += value;
                 }
             }
-            graphData["label"] = `${graphData["label"]} / ${sum}`
+            let slash = "";
+            if(graphData["type"] === "node"){
+                slash = "/n";
+            }
+            graphData["label"] = `${graphData["label"]}${slash}${sum}`
         } else {
             labelSequenceID(graphData, variantsReq, sequenceReq);
         }
