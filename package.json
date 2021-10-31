@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "development": "nodemon src/index.js",
-    "production": "node src/index.js"
+    "production": "node src/index.js",
+    "doc": "jsdoc -c jsdoc.json"
   },
   "repository": {
     "type": "git",
@@ -15,7 +16,9 @@
   "keywords": [
     "harcis",
     "paco",
+    "dfg",
     "epk",
+    "epc",
     "bpmn",
     "graph"
   ],
@@ -28,7 +31,8 @@
   "devDependencies": {
     "eslint": "^8.0.0",
     "nodemon": "^2.0.13",
-    "pretier": "0.0.1"
+    "pretier": "0.0.1",
+    "jsdoc": "^3.6.7"
   },
   "dependencies": {
     "body-parser": "^1.19.0",

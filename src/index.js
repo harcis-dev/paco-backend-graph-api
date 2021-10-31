@@ -1,3 +1,7 @@
+/**
+ * @file API - main and route 
+ */
+
 const express = require('express');
 const app = express();
 
@@ -18,6 +22,9 @@ const nodeEnv = process.env.NODE_ENV || 'development';
 
 const winston = require('winston');
 const logsDir = './logs/';
+/**
+ * Logger utils
+ */
 const logger = winston.createLogger({
     level: nodeEnv === 'development' ? 'debug' : 'info',
     format: winston.format.combine(
@@ -55,7 +62,12 @@ app.listen(process.env.SERVER_PORT, () => {
         logger.info(`Connected to Database: ${mongodbName}.`);
     });
 });
-//Get graph, filter with variants in request body
+/**
+ * Request for an graph with the given ID in MongoDB
+ * Filter with the parameter in body:
+ * - variants
+ * - sequence
+ */
 app.post("/graph/variants", (request, response) => {
     let query = {"_id": `${request.query.id}`}
     collection.findOne(query,(error, result) => {
@@ -65,9 +77,11 @@ app.post("/graph/variants", (request, response) => {
             logger.error(`${error}`);
             return response.status(500).send(error);
         }
+        /** @param {Array} variants - Filter with variants */
         if("variants" in request.body){
             variants = request.body.variants;
         }
+        /** @param {String} sequence - Filter with sequence */
         if("sequence" in request.body){
             sequence = request.body.sequence;
         }
@@ -82,7 +96,10 @@ app.post("/graph/variants", (request, response) => {
     });
 });
 
-//Insert graph if not exist, Replace graph if exist
+/**
+ * Insert graph with @param {String} _id if not exist, Replace graph if @param {String} _id exist
+ * return Response with accpeted or failed answer
+ */
 app.post("/graph", (request, response) => {
     collection.replaceOne({"_id": `${jsonParser(request.body, "_id")}`}, request.body,{upsert: true}, (error, result) => {
         if (error) {
@@ -94,6 +111,9 @@ app.post("/graph", (request, response) => {
     });
 });
 
+/**
+ * Get all availibe ids from all graphs in database
+ */
 app.get("/ids", (request, response) => {
     collection.distinct( '_id',(error, result) => {
         if (error) {
