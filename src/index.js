@@ -59,12 +59,20 @@ app.listen(process.env.SERVER_PORT, () => {
 app.post("/graph/variants", (request, response) => {
     let query = {"_id": `${request.query.id}`}
     collection.findOne(query,(error, result) => {
+        let variants = [];
+        let sequence = "";
         if (error) {
             logger.error(`${error}`);
             return response.status(500).send(error);
         }
+        if("variants" in request.body){
+            variants = request.body.variants;
+        }
+        if("sequence" in request.body){
+            sequence = request.body.sequence;
+        }
         logger.debug(`findOne: ${result}`);    
-        response.send(filterVariants(result, request.body.variants));
+        response.send(filterVariants(result, variants, sequence));
     });
 });
 
