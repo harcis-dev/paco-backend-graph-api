@@ -35,11 +35,11 @@ function filterConreteGraph(graphJSONconcrete, variantsReq, sequenceReq) {
                     sum += value;
                 }
             }
-            let slash = "";
+            let newLine = "";
             if(graphData["type"] === "node"){
-                slash = "/n";
+                newLine = "\n";
             }
-            graphData["label"] = `${graphData["label"]}${slash}${sum}`
+            graphData["label"] = `${graphData["label"]}${newLine}${sum}`
         } else {
             labelSequenceID(graphData, variantsReq, sequenceReq);
         }
@@ -72,8 +72,8 @@ function getVariantFromSequence(sequenceReq, variantsMap) {
 
 function labelSequenceID(graphData, variantsReq, sequenceReq) {
     graphDataLabel = graphData["label"]
-    if (graphDataLabel != "" && graphDataLabel != "Start" && graphDataLabel != "Ende") {
-        graphData["label"] = `${graphDataLabel} / ${graphData["variants"][variantsReq][sequenceReq]}`;
+    if (graphDataLabel != "" && graphDataLabel != "Start" && graphDataLabel != "End") {
+        graphData["label"] = `${graphDataLabel}\n${graphData["variants"][variantsReq][sequenceReq]}`;
     }
 }
 
