@@ -72,7 +72,13 @@ app.post("/graph/variants", (request, response) => {
             sequence = request.body.sequence;
         }
         logger.debug(`findOne: ${result}`);    
-        response.send(filterVariants(result, variants, sequence));
+        try{
+            response.send(filterVariants(result, variants, sequence));
+        }catch(error){
+            logger.error(`${error}`);
+            return response.status(500).send(`${error}`);
+        }
+        
     });
 });
 
