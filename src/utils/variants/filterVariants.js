@@ -1,38 +1,49 @@
 const isEmptyObject = require("../json/jsonEmpty.js")
 
-function filterVariants(graphJSON, variants) {
-    filterVariantsConrete(graphJSON.dfg.graph, variants);
-    //filterVariantsConrete(graphJSON.epc.graph, variants);
-    //filterVariantsConrete(graphJSON.bpmn.graph, variants);
+function filterVariants(graphJSON, variantsReq, sequenceReq) {
+    filterConreteGraph(graphJSON.dfg.graph, variantsReq, sequenceReq);
+    //filterVariantsConrete(graphJSON.epc.graph, variants); // TODO
+    //filterVariantsConrete(graphJSON.bpmn.graph, variants); // TODO
 
     return graphJSON
 }
 
-function arrayEquals(target, variants) {
-    return target.some(v => variants.includes(v));
-}
+function filterConreteGraph(graphJSONconcrete, variantsReq, sequenceReq) {
+    let isSequenceEmpty = isEmptyObject(sequenceReq);
+    let isReqEmpty = isEmptyObject(variantsReq) && isSequenceEmpty;
+    let variantsGraphMap = graphJSONconcrete[0]["data"]["variants"];
+    let frequencyMap = {}
+    if (isSequenceEmpty) {
+        frequencyMap = getFrequencyMap(variantsGraphMap);
+    } else {
+        variantsReq = getVariantFromSequence(sequenceReq, variantsGraphMap);
+    }
+    for (var i = 0; i < graphJSONconcrete.length; i++) {      
+        let graphData = graphJSONconcrete[i].data;
+        let variantsGraph = Object.keys(graphData["variants"]);
 
-function filterVariantsConrete(graphJSONconcrete, variants) {
-    let isVariantsEmpty = isEmptyObject(variants);
-    let frequencyMap = getFrequencyMap(graphJSONconcrete[0]["data"]["variants"])
-    for (var i = 0; i < graphJSONconcrete.length; i++) {
-        let sum = 0;
-        let graphData = graphJSONconcrete[i].data
-        let graphVariants = Object.keys(graphData.variants);
-        if (!(arrayEquals(graphVariants, variants)) && !isVariantsEmpty) {
+        if (!(arrayEquals(variantsGraph, variantsReq)) && !isReqEmpty) {
             graphJSONconcrete.splice(i, 1);
             i--;
             continue;
         }
-        for (const [key, value] of Object.entries(frequencyMap)) {
-            if (graphVariants.includes(key) && (variants.includes(key) || isVariantsEmpty)) {
-                sum += value;
+        if (isSequenceEmpty) {
+            let sum = 0;
+            for (const [key, value] of Object.entries(frequencyMap)) {
+                if (variantsGraph.includes(key) && (variantsReq.includes(key) || isReqEmpty)) {
+                    sum += value;
+                }
             }
+            graphData["label"] = `${graphData["label"]} / ${sum}`
+        } else {
+            labelSequenceID(graphData, variantsReq, sequenceReq);
+        }
+        //delete graphJSONconcrete[i]["data"]["variants"]; // Add this in Production Mode
+    }
+}
 
-    }
-        graphData.label = `${graphData.label} / ${sum}`
-        //delete graphJSONconcrete[i]["data"]["variants"]// Add this in Production Mode
-    }
+function arrayEquals(target, variants) {
+    return target.some(v => variants.includes(v));
 }
 
 function getFrequencyMap(variants) {
@@ -42,6 +53,23 @@ function getFrequencyMap(variants) {
         frequencyMap[key] = Object.keys(variants[key]).length;
     });
     return frequencyMap;
+}
+
+function getVariantFromSequence(sequenceReq, variantsMap) {
+    for (const [key, value] of Object.entries(variantsMap)) {
+        for (let sequence in value) {
+            if (sequence === sequenceReq) {
+                return key;
+            }
+        }
+    }
+}
+
+function labelSequenceID(graphData, variantsReq, sequenceReq) {
+    graphDataLabel = graphData["label"]
+    if (graphDataLabel != "" && graphDataLabel != "Start" && graphDataLabel != "Ende") {
+        graphData["label"] = `${graphDataLabel} / ${graphData["variants"][variantsReq][sequenceReq]}`;
+    }
 }
 
 module.exports = filterVariants;
