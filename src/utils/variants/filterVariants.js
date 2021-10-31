@@ -1,10 +1,9 @@
 const isEmptyObject = require("../json/jsonEmpty.js")
 
 function filterVariants(graphJSON, variants) {
-    let isVariantsEmpty = isEmptyObject(variants);
-    filterVariantsConrete(graphJSON.dfg.graph, variants, isVariantsEmpty);
-    //filterVariantsConrete(graphJSON.epc.graph, variants, isVariantsEmpty);
-    //filterVariantsConrete(graphJSON.bpmn.graph, variants, isVariantsEmpty);
+    filterVariantsConrete(graphJSON.dfg.graph, variants);
+    //filterVariantsConrete(graphJSON.epc.graph, variants);
+    //filterVariantsConrete(graphJSON.bpmn.graph, variants);
 
     return graphJSON
 }
@@ -13,7 +12,8 @@ function arrayEquals(target, variants) {
     return target.some(v => variants.includes(v));
 }
 
-function filterVariantsConrete(graphJSONconcrete, variants, isVariantsEmpty) {
+function filterVariantsConrete(graphJSONconcrete, variants) {
+    let isVariantsEmpty = isEmptyObject(variants);
     let frequencyMap = getFrequencyMap(graphJSONconcrete[0]["data"]["variants"])
     for (var i = 0; i < graphJSONconcrete.length; i++) {
         let sum = 0;
@@ -28,8 +28,9 @@ function filterVariantsConrete(graphJSONconcrete, variants, isVariantsEmpty) {
             if (graphVariants.includes(key) && (variants.includes(key) || isVariantsEmpty)) {
                 sum += value;
             }
-        }
-        graphData.label = `${graphData.label} \n ${sum}`
+
+    }
+        graphData.label = `${graphData.label} / ${sum}`
         //delete graphJSONconcrete[i]["data"]["variants"]// Add this in Production Mode
     }
 }
