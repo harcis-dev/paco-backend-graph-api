@@ -1,0 +1,16 @@
+version: '3.7'
+services:
+  paco-graph-api:
+    environment:
+      - NODE_ENV=development
+  mongo-express:
+    image: mongo-express
+    environment:
+        - ME_CONFIG_MONGODB_SERVER=mongo
+        - ME_CONFIG_MONGODB_PORT=27017
+        - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
+        - ME_CONFIG_MONGODB_AUTH_DATABASE=admin
+    links:
+        - mongo
+    ports:
+        - "8081:8081"

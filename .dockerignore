@@ -1,7 +1,10 @@
 README.md
-Dockerfile
-.dockerignore
-node_modules/
+
+docs/
 logs/
-scripts/
-package-lock.json
+node_modules/
+
+.dockerignore
+.git
+.gitignore
+Dockerfile

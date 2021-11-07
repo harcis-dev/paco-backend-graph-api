@@ -8,4 +8,5 @@ COPY ["./src", "./src"]
 RUN npm install --production
 
 EXPOSE 8080
-CMD ["npm", "run", "production"]
+
+CMD ["node", "./src/index.js"]

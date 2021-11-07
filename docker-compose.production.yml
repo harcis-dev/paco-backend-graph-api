@@ -1,0 +1,5 @@
+version: '3.7'
+services:
+  paco-graph-api:
+    environment:
+      - NODE_ENV=production
