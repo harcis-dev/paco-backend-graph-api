@@ -13,13 +13,13 @@ const mongodbPort = process.env.MONGODB_PORT || "27017";
 const mongodbUrl = `mongodb://${mongodbHost}:${mongodbPort}/`;
 // ${process.env.MONGO_ROOT_USER}:${process.env.MONGO_ROOT_PASSWORD}@
 const mongodbName = 'graph';
-
+const mongodbCollection = 'graph';
 const bodyParser = require('body-parser');
 const jsonParser = require("./utils/json/jsonParser.js")
 const filterVariants = require("./utils/variants/filterVariants.js")
 const nodeEnv = process.env.NODE_ENV || 'development';
 const serverPort = process.env.SERVER_PORT || 8080;
-var logger = require('./log.js'); 
+var logger = require('./utils/log/log.js'); 
 logger.info(`Service started in ${nodeEnv}-Mode on Port ${serverPort}`);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
@@ -30,8 +30,8 @@ app.listen(serverPort, () => {
             throw error;
         }
         database = client.db(mongodbName);
-        collection = database.collection(mongodbName);
-        logger.info(`Connected to Database: ${mongodbName}.`);
+        collection = database.collection(mongodbCollection);
+        logger.info(`Connected to Database: ${mongodbName}. Collection: ${mongodbCollection}.`);
     });
 });
 /**

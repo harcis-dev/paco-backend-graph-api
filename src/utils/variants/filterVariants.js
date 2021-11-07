@@ -1,6 +1,6 @@
 const isEmptyObject = require("../json/jsonEmpty.js")
 const nodeEnv = process.env.NODE_ENV || 'development';
-var logger = require('../../log.js');
+var logger = require('../log/log.js');
 /**
  * Filter all the given graph with requestparameters
  * @param {Object} graphJSON - complete graph
@@ -9,6 +9,7 @@ var logger = require('../../log.js');
  * @returns {Object} graphJSON - processed graph
  */
 function filterGraph(graphJSON, variantsReq, sequenceReq) {
+    logger.debug(`filter graph`);
     filterConreteGraph(graphJSON["dfg"]["graph"], variantsReq, sequenceReq);
     //filterVariantsConrete(graphJSON.epc.graph, variants); // TODO
     //filterVariantsConrete(graphJSON.bpmn.graph, variants); // TODO

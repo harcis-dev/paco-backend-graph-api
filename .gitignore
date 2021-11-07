@@ -6,8 +6,10 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
-/logs
+
 /.idea
-/node_modules
 /docs
+/logs
+/node_modules
+
 .env
