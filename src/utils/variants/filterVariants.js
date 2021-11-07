@@ -84,7 +84,7 @@ function filterConreteGraph(graphJSONconcrete, variantsReq, sequenceReq) {
             if(test){
                 for (value of spacingWidthArray) {
                     if (graphData["sum"] <= parseInt(value)) {
-                        graphData["width"] = value;
+                        graphData["width"] = spacingWidthArray.indexOf(value) + 1;
                         if (nodeEnv === 'production') {
                             delete graphJSONconcrete[i]["data"]["sum"];
                         }
