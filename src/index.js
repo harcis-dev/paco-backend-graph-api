@@ -18,11 +18,12 @@ const bodyParser = require('body-parser');
 const jsonParser = require("./utils/json/jsonParser.js")
 const filterVariants = require("./utils/variants/filterVariants.js")
 const nodeEnv = process.env.NODE_ENV || 'development';
+const serverPort = process.env.SERVER_PORT || 8080;
 var logger = require('./log.js'); 
-logger.info(`Service started in ${nodeEnv}-Mode`);
+logger.info(`Service started in ${nodeEnv}-Mode on Port ${serverPort}`);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
-app.listen(process.env.SERVER_PORT, () => {
+app.listen(serverPort, () => {
     mongoClient.connect(mongodbUrl, {useNewUrlParser: true}, (error, client) => {
         if (error) {
             logger.error(`${error}`);
