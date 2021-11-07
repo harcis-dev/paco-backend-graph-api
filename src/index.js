@@ -17,37 +17,8 @@ const mongodbName = 'graph';
 const bodyParser = require('body-parser');
 const jsonParser = require("./utils/json/jsonParser.js")
 const filterVariants = require("./utils/variants/filterVariants.js")
-
 const nodeEnv = process.env.NODE_ENV || 'development';
-
-const winston = require('winston');
-const logsDir = './logs/';
-/**
- * Logger utils
- */
-const logger = winston.createLogger({
-    level: nodeEnv === 'development' ? 'debug' : 'info',
-    format: winston.format.combine(
-        winston.format.timestamp({
-            format: 'YYYY-MM-DD HH:mm:ss',
-        }),
-        winston.format.errors({ stack: true }),
-        winston.format.splat(),
-        winston.format.json()
-    ),
-    defaultMeta: { service: 'graph-api' },
-    transports: [
-        new winston.transports.File({ filename: `${logsDir}error.log`, level: 'error' }),
-        new winston.transports.File({ filename: `${logsDir}combined.log` }),
-        new winston.transports.Console({
-            format: winston.format.combine(
-                winston.format.colorize(),
-                winston.format.simple()
-            ),
-        })
-    ],
-});
-
+var logger = require('./log.js'); 
 logger.info(`Service started in ${nodeEnv}-Mode`);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
