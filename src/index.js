@@ -17,6 +17,7 @@ const mongodbCollection = 'graph';
 const bodyParser = require('body-parser');
 const jsonParser = require("./utils/json/jsonParser.js")
 const filterVariants = require("./utils/variants/filterVariants.js")
+const convertDFG2Graphml = require("./utils/convert/dfgToGraphml.js")
 const nodeEnv = process.env.NODE_ENV || 'development';
 const serverPort = process.env.SERVER_PORT || 8080;
 var logger = require('./utils/log/log.js'); 
@@ -94,5 +95,35 @@ app.get("/ids", (request, response) => {
         }
         logger.debug(`find: ${result}`);
         response.send(result);
+    });
+});
+
+app.post("/graph/download", (request, response) => {
+    let query = {"_id": `${request.query.id}`}
+    collection.findOne(query,(error, result) => {
+        let variants = [];
+        let sequence = "";
+        if (error) {
+            logger.error(`${error}`);
+            return response.status(500).send(error);
+        }
+        /** @param {Array} variants - Filter with variants */
+        if("variants" in request.body){
+            variants = request.body.variants;
+        }
+        /** @param {String} sequence - Filter with sequence */
+        if("sequence" in request.body){
+            sequence = request.body.sequence;
+        }
+        logger.debug(`findOne: ${result}`);    
+        try{
+            let graphId = result["_id"]
+            let dfg = result["dfg"]["graph"]
+            response.send(convertDFG2Graphml(graphId, dfg));
+        }catch(error){
+            logger.error(`${error}`);
+            return response.status(500).send(`${error}`);
+        }
+        
     });
 });
