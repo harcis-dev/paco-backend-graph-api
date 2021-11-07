@@ -40,7 +40,7 @@ function filterConreteGraph(graphJSONconcrete, variantsReq, sequenceReq) {
     }
     /** Iterate trough graph data. Use the filters, if available */
     for (var i = 0; i < graphJSONconcrete.length; i++) {
-        let graphData = graphJSONconcrete[i].data;
+        let graphData = graphJSONconcrete[i]["data"];
         let variantsGraph = Object.keys(graphData["variants"]);
         /** Filter for variants. Delete data if not requested */
         if (!(checkArrayItem(variantsGraph, variantsReq)) && !isReqEmpty) {
@@ -80,7 +80,7 @@ function filterConreteGraph(graphJSONconcrete, variantsReq, sequenceReq) {
     if (isSequenceEmpty) {
         let spacingWidthArray = getSpacingWidth(smallestSum, biggestSum);
         for (var i = 0; i < graphJSONconcrete.length; i++) {
-            let graphData = graphJSONconcrete[i].data;
+            let graphData = graphJSONconcrete[i]["data"];
             if(graphData["type"] === 'DirectedEdge'){
                 for (value of spacingWidthArray) {
                     if (graphData["sum"] <= parseInt(value)) {
