@@ -1,5 +1,6 @@
 const isEmptyObject = require("../json/jsonEmpty.js")
-
+const nodeEnv = process.env.NODE_ENV || 'development';
+var logger = require('../../log.js');
 /**
  * Filter all the given graph with requestparameters
  * @param {Object} graphJSON - complete graph
@@ -28,6 +29,8 @@ function filterConreteGraph(graphJSONconcrete, variantsReq, sequenceReq) {
     let isReqEmpty = isEmptyObject(variantsReq) && isSequenceEmpty;
     let variantsGraphMap = graphJSONconcrete[0]["data"]["variants"];
     let frequencyMap = {}
+    let smallestSum = 9999
+    let biggestSum = 0
     /** Sequence is availible add Node-ID to Label, otherwise get frequency */
     if (isSequenceEmpty) {
         frequencyMap = getFrequencyMap(variantsGraphMap);
@@ -35,7 +38,7 @@ function filterConreteGraph(graphJSONconcrete, variantsReq, sequenceReq) {
         variantsReq = getVariantFromSequence(sequenceReq, variantsGraphMap);
     }
     /** Iterate trough graph data. Use the filters, if available */
-    for (var i = 0; i < graphJSONconcrete.length; i++) {      
+    for (var i = 0; i < graphJSONconcrete.length; i++) {
         let graphData = graphJSONconcrete[i].data;
         let variantsGraph = Object.keys(graphData["variants"]);
         /** Filter for variants. Delete data if not requested */
@@ -52,16 +55,61 @@ function filterConreteGraph(graphJSONconcrete, variantsReq, sequenceReq) {
                 }
             }
             let newLine = "";
-            if(graphData["type"] === "node"){
+            if (graphData["type"] === "node") {
                 newLine = "\n";
             }
-            graphData["label"] = `${graphData["label"]}${newLine}${sum}`
+            if (graphData["type"] === "DirectedEdge") {
+                graphData["sum"] = sum;
+            }
+            if (sum > biggestSum) {
+                biggestSum = sum;
+            }
+            if (sum < smallestSum) {
+                smallestSum = sum;
+            }
+            graphData["label"] = `${graphData["label"]}${newLine}${sum}`;
+            
         } else {
             labelSequenceID(graphData, variantsReq, sequenceReq);
         }
-        /** Delete Variants-Information - not needed in production - mode */
-        //delete graphJSONconcrete[i]["data"]["variants"]; // Add this in Production Mode
+        if (nodeEnv === 'production') {
+            delete graphJSONconcrete[i]["data"]["variants"];
+        }
     }
+    if (isSequenceEmpty) {
+        let spacingWidthArray = getSpacingWidth(smallestSum, biggestSum);
+        for (var i = 0; i < graphJSONconcrete.length; i++) {
+            let graphData = graphJSONconcrete[i].data;
+            let test = graphData["type"] === 'DirectedEdge';
+            if(test){
+                for (value of spacingWidthArray) {
+                    if (graphData["sum"] <= parseInt(value)) {
+                        graphData["width"] = value;
+                        if (nodeEnv === 'production') {
+                            delete graphJSONconcrete[i]["data"]["sum"];
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
+
+function getSpacingWidth(smallestSum, biggestSum) {
+    let spacingWidthArray = [];
+    if (biggestSum < 10) {
+        for (let i = 1; i <= biggestSum; i++) {
+            spacingWidthArray.push(i);
+        }
+    } else {
+        let value = (biggestSum - smallestSum) / 10
+
+        for (let i = 1; i <= 10; i++) {
+            spacingWidthArray.push(Math.round(value * i));
+        }
+    }
+    return spacingWidthArray;
 }
 
 /**
