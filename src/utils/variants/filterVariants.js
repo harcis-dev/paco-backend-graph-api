@@ -56,16 +56,16 @@ function filterConreteGraph(graphJSONconcrete, variantsReq, sequenceReq) {
                 }
             }
             let newLine = "";
-            if (graphData["type"] === "node") {
+            if (graphData.hasOwnProperty("target")) { /** Is the element is an edge */
+                graphData["sum"] = sum;
+            }else {                                 /** The element is a node */
                 newLine = "\n";
             }
-            if (graphData["type"] === "DirectedEdge") {
-                graphData["sum"] = sum;
-            }
-            if (sum > biggestSum) {
+
+            if (sum > biggestSum && !isStartOrEndNode(graphData["label"])) {
                 biggestSum = sum;
             }
-            if (sum < smallestSum) {
+            if (sum < smallestSum && !isStartOrEndNode(graphData["label"])) {
                 smallestSum = sum;
             }
             graphData["label"] = `${graphData["label"]}${newLine}${sum}`;
@@ -81,8 +81,7 @@ function filterConreteGraph(graphJSONconcrete, variantsReq, sequenceReq) {
         let spacingWidthArray = getSpacingWidth(smallestSum, biggestSum);
         for (var i = 0; i < graphJSONconcrete.length; i++) {
             let graphData = graphJSONconcrete[i].data;
-            let test = graphData["type"] === 'DirectedEdge';
-            if(test){
+            if(graphData["type"] === 'DirectedEdge'){
                 for (value of spacingWidthArray) {
                     if (graphData["sum"] <= parseInt(value)) {
                         graphData["width"] = spacingWidthArray.indexOf(value) + 1;
@@ -97,6 +96,22 @@ function filterConreteGraph(graphJSONconcrete, variantsReq, sequenceReq) {
     }
 }
 
+/**
+ * Check if Label is the start or end node
+ * @param {String} graphDataLabel 
+ * @returns {Boolean} 
+ */
+function isStartOrEndNode(graphDataLabel){
+    return graphDataLabel === "Start" && graphDataLabel === "End";
+}
+
+/**
+ * Build an Array with the needed interval between frequences
+ * to get a naive gradation between arrow width
+ * @param {Number} smallestSum 
+ * @param {Number} biggestSum 
+ * @returns {Array} Array with distance lengths
+ */
 function getSpacingWidth(smallestSum, biggestSum) {
     let spacingWidthArray = [];
     if (biggestSum < 10) {
@@ -156,12 +171,12 @@ function getVariantFromSequence(sequenceReq, variant) {
 /**
  * Label the node with Node-ID
  * @param {Object} graphData - graph json
- * @param {String} variant - variant the sequence depends on
+ * @param {String} variant - variant, which the sequence depends on
  * @param {String} sequenceReq  - requested sequence
  */
 function labelSequenceID(graphData, variant, sequenceReq) {
     graphDataLabel = graphData["label"]
-    if (graphDataLabel != "" && graphDataLabel != "Start" && graphDataLabel != "End") {
+    if (graphDataLabel != "" && !isStartOrEndNode(graphDataLabel)) {
         graphData["label"] = `${graphDataLabel}\n${graphData["variants"][variant][sequenceReq]}`;
     }
 }
