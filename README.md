@@ -1,39 +1,40 @@
 # paco-backend-graph-api
 
-Configurate the .env-File:
-
-\# Production || Development:
-```
-# .env
-MONGO_ROOT_USER=""
-MONGO_ROOT_PASSWORD=""
-MONGODB_PORT=27017
-# host.docker.internal || 127.0.0.1
-MONGODB_DOMAIN=host.docker.internal
-SERVER_PORT=8080
-# production || development
-NODE_ENV=production
-```
-Build and run the Dockercontainer with `docker-build.sh` and `docker-run.sh` found in `scripts/`
-
-For development run `npm run development`, for production `npm run production`
+Build and run the Dockercontainer with `npm run docker:dev` or `npm run docker:prod` found in `package.json`
 
 - API-Calls:
 
-  - Get graph:
-    - GET http://localhost:8080/ids
+  - Get graphs:
+    - Get all availibe ids from all graphs in database
+    - `GET http://localhost:8080/ids`
 
   - Add graph:
-    - POST http://localhost:8080/graph
+    - Add a graph to MongoDB 
+    - `POST http://localhost:8080/graph`
     - Body: 
-            ```json
-            {
-            "_id": "4",
-            "generally": {"graph": "a graph"},
-            "epk": {"graph": "a lol graph"},
-            "bpmn": {"graph": "a graph"}
-            }
-            ```
+     ```json
+      {
+      "_id": "4",
+      "dfg": {"graph": "a graph"},
+      "epc": {"graph": "a graph"},
+      "bpmn": {"graph": "a graph"}
+      }
+      ```
 
   - Read graph:
-    - GET http://localhost:8080/graph?id=4
+    - Request for an graph with the given ID in MongoDB
+    - `POST http://localhost:8080/graph/variants?id=2`   
+    - Filter with the parameter in body:
+      - variants
+        ```json
+        {
+        "variants": ["3"]
+        }
+        ```
+      - sequence
+        ```json
+        {
+        "sequence": "001_0",
+        }
+        ```
+ - For more information run `npm run doc`
