@@ -111,13 +111,10 @@ app.post("/graph/download", (request, response) => {
         if("variants" in request.body){
             variants = request.body.variants;
         }
-        /** @param {String} sequence - Filter with sequence */
-        if("sequence" in request.body){
-            sequence = request.body.sequence;
-        }
         logger.debug(`findOne: ${result}`);    
         try{
             let graphId = result["_id"]
+            result = filterVariants(result, variants, "")
             let dfg = result["dfg"]["graph"]
             response.send(convertDFG2Graphml(graphId, dfg));
         }catch(error){

@@ -15,9 +15,9 @@ function convertDFG2Graphml(graphJSONID, dfg) {
         let graphData = dfg[i]["data"];
         if (!graphData.hasOwnProperty("target")){
             let id = graphData["id"];
-            let label = graphData["label"];
+            let label = graphData["label"].split("\n");;
             xmlString += `<node id="${id}">\n`
-            xmlString += `<data key="label">${label}</data>\n`
+            xmlString += `<data key="label">${label[0]}</data>\n`
             xmlString += `</node>`
         }else{
             let source = graphData["source"];
