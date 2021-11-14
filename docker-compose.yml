@@ -12,7 +12,3 @@ services:
       - mongo
   mongo:
     image: mongo
-    environment:
-        - MONGO_INITDB_DATABASE=graph
-    ports:
-        - "27017:27017"
