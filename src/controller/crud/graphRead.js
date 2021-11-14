@@ -9,7 +9,7 @@ const logger = require('../../utils/log/log.js');
  * - sequence
  */
 function getGraph(request, response){
-    let query = {"_id": `${request.params.graphId}`}
+    let query = {"_id": `${request.params.graphId}`};
     collection.findOne(query,(error, result) => {
         let variants = [];
         let sequence = "";

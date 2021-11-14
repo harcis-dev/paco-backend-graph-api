@@ -18,8 +18,8 @@ const graphCreate = require('./controller/crud/graphCreate.js');            // P
 const graphRead = require('./controller/crud/graphRead.js');                // POST
 const graphDelete = require('./controller/crud/graphDelete.js');            // DELETE
 const graphIds = require('./controller/crud/graphIds.js');                  // GET
-const dfgAsGraphml = require('./controller/download/dfgAsGraphml.js');      // POST
-
+const dfgAsGraphml = require('./controller/download/dfgAsGraphml.js');      // POST 
+const graphmlAsDfg = require('./controller/import/graphmlAsDfg.js');        // POST
 // Logging
 const logger = require('./utils/log/log.js'); 
 
@@ -32,6 +32,8 @@ appRouter.use(express.urlencoded({extended: true}));
 // Routes
 appRouter.post('/', graphCreate);
 
+appRouter.post('/import', graphmlAsDfg);
+
 appRouter.post('/:graphId', graphRead);
 
 appRouter.delete('/:graphId', graphDelete);
@@ -39,6 +41,7 @@ appRouter.delete('/:graphId', graphDelete);
 appRouter.get('/ids', graphIds);
 
 appRouter.post('/download/:graphId', dfgAsGraphml);
+
 
 app.use('/graph', appRouter); 
 
