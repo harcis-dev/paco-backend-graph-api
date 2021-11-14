@@ -38,7 +38,7 @@ appRouter.delete('/:graphId', graphDelete);
 
 appRouter.get('/ids', graphIds);
 
-appRouter.post('/download', dfgAsGraphml);
+appRouter.post('/download/:graphId', dfgAsGraphml);
 
 app.use('/graph', appRouter); 
 

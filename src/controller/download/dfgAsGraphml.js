@@ -3,7 +3,7 @@ const convertDFG2Graphml = require("../../utils/convert/dfgToGraphml.js")
 const logger = require('../../utils/log/log.js'); 
 
 function downloadDfgAsGraphml(request, response){
-    let query = {"_id": `${request.query.id}`}
+    let query = {"_id": `${request.params.graphId}`}
     collection.findOne(query,(error, result) => {
         let variants = [];
         let sequence = "";
