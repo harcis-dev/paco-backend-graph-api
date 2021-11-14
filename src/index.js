@@ -22,8 +22,8 @@ const nodeEnv = process.env.NODE_ENV || 'development';
 const serverPort = process.env.SERVER_PORT || 8080;
 var logger = require('./utils/log/log.js'); 
 logger.info(`Service started in ${nodeEnv}-Mode on Port ${serverPort}`);
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
 app.listen(serverPort, () => {
     mongoClient.connect(mongodbUrl, {useNewUrlParser: true}, (error, client) => {
         if (error) {
