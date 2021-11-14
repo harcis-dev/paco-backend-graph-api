@@ -10,15 +10,17 @@ function convertGraphml2DFG(reqBody) {
     let nodeList = graphJson["graphml"]["graph"]["node"];
     for (node of nodeList) {
         let id = node["id"];
-        let label = node["data"]["$t"];
-        graphDataArray.push({ "data": { "id": id, "label": label, "type": "node" } })
+        let label = node["data"][0]["$t"];
+        let variants = JSON.parse(node["data"][1]["$t"]);
+        graphDataArray.push({ "data": { "id": id, "label": label, "type": "node", "variants": variants } })
     }
 
     let edgeList = graphJson["graphml"]["graph"]["edge"];
     for (edge of edgeList) {
         let source = edge["source"];
         let target = edge["target"];
-        graphDataArray.push({ "data": { "source": source, "target": target, "label": "", "type": "DirectedEdge" } });
+        let variants = JSON.parse(edge["data"]["$t"]);
+        graphDataArray.push({ "data": { "source": source, "target": target, "label": "", "type": "DirectedEdge", "variants": variants } });
     }
 
     return { "graph": graphDataArray };
