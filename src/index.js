@@ -17,8 +17,8 @@ const mongoListener = require('./database/mongodb.js')
 
 // Controller
 const graphCreate = require('./controller/crud/graphCreate.js');            // POST
-//let graphDelete = require('./controller/crud/graphDelete.js');            // DELETE
 const graphRead = require('./controller/crud/graphRead.js');                // POST
+const graphDelete = require('./controller/crud/graphDelete.js');            // DELETE
 const graphIds = require('./controller/crud/graphIds.js');                  // GET
 const dfgAsGraphml = require('./controller/download/dfgAsGraphml.js');      // POST
 
@@ -35,6 +35,8 @@ appRouter.use(express.urlencoded({extended: true}));
 appRouter.post('/', graphCreate);
 
 appRouter.post('/filter', graphRead);
+
+appRouter.delete('/', graphDelete);
 
 appRouter.get('/ids', graphIds);
 
