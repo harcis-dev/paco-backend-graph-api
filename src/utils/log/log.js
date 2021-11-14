@@ -1,5 +1,4 @@
 var winston = require('winston');
-var Loggly = require('winston-loggly').Loggly;
 const nodeEnv = process.env.NODE_ENV || 'development';
 const logsDir = './logs/';
 /**
