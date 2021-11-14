@@ -1,4 +1,4 @@
-const filterVariants = require("../../utils/filter/filterGraph.js")
+const filterGraph = require("../../utils/filter/filterGraph.js")
 
 const logger = require('../../utils/log/log.js'); 
 
@@ -27,7 +27,7 @@ function getGraph(request, response){
         }
         logger.debug(`findOne: ${result}`);    
         try{
-            response.send(filterVariants(result, variants, sequence));
+            response.send(filterGraph(result, variants, sequence));
         }catch(error){
             logger.error(`${error}`);
             return response.status(500).send(`${error}`);

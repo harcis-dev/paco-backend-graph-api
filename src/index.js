@@ -1,9 +1,10 @@
 /**
- * @file API - main and route 
+ * @file API - main and routes
  */
 
 const express = require('express');
 const app = express();
+const appRouter = express.Router();
 
 require('dotenv').config({path: require('find-config')(`.env`)})
 
@@ -15,25 +16,30 @@ const serverPort = process.env.SERVER_PORT || 8080;
 const mongoListener = require('./database/mongodb.js')
 
 // Controller
-const graphCreate = require('./controller/crud/graphCreate.js');         // POST
-//let graphDelete = require('./controller/crud/graphDelete.js');         // DELETE
-const graphRead = require('./controller/crud/graphRead.js');           // POST
-const graphIds = require('./controller/crud/graphIds.js');            // GET
-const dfgAsGraphml = require('./controller/download/dfgAsGraphml.js');    // POST
+const graphCreate = require('./controller/crud/graphCreate.js');            // POST
+//let graphDelete = require('./controller/crud/graphDelete.js');            // DELETE
+const graphRead = require('./controller/crud/graphRead.js');                // POST
+const graphIds = require('./controller/crud/graphIds.js');                  // GET
+const dfgAsGraphml = require('./controller/download/dfgAsGraphml.js');      // POST
 
 // Logging
 const logger = require('./utils/log/log.js'); 
 
-logger.info(`Service started in ${nodeEnv}-Mode on Port ${serverPort}`);
 
-app.use(express.json());
-app.use(express.urlencoded({extended: true}));
 app.listen(serverPort, mongoListener);
 
-app.post('/graph', graphCreate);
+appRouter.use(express.json());
+appRouter.use(express.urlencoded({extended: true}));
 
-app.post('/graph/variants', graphRead);
+// Routes
+appRouter.post('/', graphCreate);
 
-app.get('/graph/ids', graphIds);
+appRouter.post('/filter', graphRead);
 
-app.post('/graph/download', dfgAsGraphml);
+appRouter.get('/ids', graphIds);
+
+appRouter.post('/download', dfgAsGraphml);
+
+app.use('/graph', appRouter); 
+
+logger.info(`Service started in ${nodeEnv}-Mode on Port ${serverPort}`);

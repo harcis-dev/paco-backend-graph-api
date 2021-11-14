@@ -5,6 +5,7 @@ const mongodbUrl = `mongodb://${mongodbHost}:${mongodbPort}/`;
 // ${process.env.MONGO_ROOT_USER}:${process.env.MONGO_ROOT_PASSWORD}@
 const mongodbName = process.env.MONGODB_DATABASE ||'graph-database';
 const mongodbCollection = process.env.MONGODB_COLLECTION ||'graph-collection';
+
 const logger = require('../utils/log/log.js'); 
 
 function mongoListener(){
