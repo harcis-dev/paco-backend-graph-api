@@ -7,7 +7,7 @@ const logger = require('../../utils/log/log.js');
  * - sequence
  */
 function deleteGraph(request, response) {
-    let query = { "_id": `${request.query.id}` }
+    let query = {"_id": `${request.params.graphId}`}
     collection.deleteOne(query, (error, result) => {
         if (error) {
             logger.error(`${error}`);

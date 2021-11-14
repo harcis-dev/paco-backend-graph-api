@@ -6,8 +6,6 @@ const express = require('express');
 const app = express();
 const appRouter = express.Router();
 
-require('dotenv').config({path: require('find-config')(`.env`)})
-
 // Run-Confgis
 const nodeEnv = process.env.NODE_ENV || 'development';
 const serverPort = process.env.SERVER_PORT || 8080;
@@ -34,9 +32,9 @@ appRouter.use(express.urlencoded({extended: true}));
 // Routes
 appRouter.post('/', graphCreate);
 
-appRouter.post('/filter', graphRead);
+appRouter.post('/:graphId', graphRead);
 
-appRouter.delete('/', graphDelete);
+appRouter.delete('/:graphId', graphDelete);
 
 appRouter.get('/ids', graphIds);
 
