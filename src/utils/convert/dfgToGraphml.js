@@ -1,4 +1,4 @@
-var logger = require('../log/log.js');
+const logger = require('../log/log.js');
 
 /**
  * Convert dfg Object to graphml

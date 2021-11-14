@@ -1,6 +1,6 @@
 const isEmptyObject = require("../json/jsonEmpty.js")
 const nodeEnv = process.env.NODE_ENV || 'development';
-var logger = require('../log/log.js');
+const logger = require('../log/log.js');
 /**
  * Filter all the given graph with requestparameters
  * @param {Object} graphJSON - complete graph
