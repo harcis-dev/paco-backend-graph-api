@@ -2,11 +2,11 @@ const logger = require('../log/log.js');
 
 /**
  * Convert dfg Object to graphml
- * @param {Number} graphJSONID SAP-ID
+ * @param {Number} _id SAP-ID
  * @param {Object} dfg dfg-graph
  * @returns {String} Contains dfg in graphml format
  */
-function convertDFG2Graphml(graphJSONID, dfg) {
+function convertDFG2Graphml(_id, dfg) {
     logger.debug(`convert dfg to graphml`);
     let xmlString = xmlHead;
     
@@ -14,8 +14,7 @@ function convertDFG2Graphml(graphJSONID, dfg) {
         xmlString +='<key attr.name="variants" attr.type="string" for="node" id="variants" />\
         <key attr.name="variants" attr.type="string" for="edge" id="variants" />'
     }
-    let graphId = graphJSONID
-    xmlString += `<graph id="${graphId}" edgedefault="directed">`
+    xmlString += `<graph id="${_id}" edgedefault="directed">`
     for (var i = 0; i < dfg.length; i++) {
         let graphData = dfg[i]["data"];
         hasVariants = graphData.hasOwnProperty("variants");

@@ -9,8 +9,11 @@ const logger = require('../../utils/log/log.js');
  * - sequence
  */
 function getGraph(request, response){
-    let query = {"_id": `${request.params.graphId}`};
+    let query = {"_id": `${request["params"]["_id"]}`};
     collection.findOne(query,(error, result) => {
+        if(typeof result == 'undefined' || result == null){
+            return response.status(400).send("Error: No graph in database with provided _id");
+        }
         let variants = [];
         let sequence = "";
         if (error) {
@@ -18,19 +21,19 @@ function getGraph(request, response){
             return response.status(500).send(error);
         }
         /** @param {Array} variants - Filter with variants */
-        if("variants" in request.body){
-            variants = request.body.variants;
+        if("variants" in request["body"]){
+            variants = request["body"]["variants"];
         }
         /** @param {String} sequence - Filter with sequence */
-        if("sequence" in request.body){
-            sequence = request.body.sequence;
+        if("sequence" in request["body"]){
+            sequence = request["body"]["sequence"];
         }
         logger.debug(`findOne: ${result}`);    
         try{
             response.send(filterGraph(result, variants, sequence));
         }catch(error){
             logger.error(`${error}`);
-            return response.status(500).send(`${error}`);
+            return response.status(400).send(`${error}`);
         }
         
     });

@@ -9,12 +9,19 @@ const convertGraphml2DFG = require("../../utils/convert/graphmlToDfg.js")
  * @param {*} response 
  */
 function importGraphmlAsDfg(request, response){
-    let _id = jsonParser(request.body, "_id")
-    let name = _id;
-    if(request.body.hasOwnProperty('name')){
-        name = request.body['name'];
+    if(!request["body"].hasOwnProperty('_id')){
+        return response.status(400).send("Error: Requestbody must contain _id");
     }
-    dfgJson = convertGraphml2DFG(request.body["dfg"]);
+    if(!request["body"].hasOwnProperty('dfg')){
+        return response.status(400).send("Error: Requestbody must contain dfg");
+    }
+    let _id = jsonParser(request["body"], "_id")
+    if(!request["body"].hasOwnProperty('name')){
+        request["body"]['name'] = _id
+    }
+    let name = request["body"]['name'];
+
+    let dfgJson = convertGraphml2DFG(request["body"]["dfg"]);
     collection.replaceOne({"_id": `${_id}`}, {"_id": `${_id}`,"name": name, "dfg": dfgJson},{upsert: true}, (error, result) => {
         if (error) {
             logger.error(`${error}`);

@@ -35,15 +35,15 @@ appRouter.post('/', graphCreate);
 
 appRouter.post('/import', graphmlAsDfg);
 
-appRouter.post('/:graphId', graphRead);
+appRouter.post('/:_id', graphRead);
 
-appRouter.put('/:graphId', graphRename);
+appRouter.put('/:_id', graphRename);
 
-appRouter.delete('/:graphId', graphDelete);
+appRouter.delete('/:_id', graphDelete);
 
 appRouter.get('/ids', graphIds);
 
-appRouter.post('/download/:graphId', dfgAsGraphml);
+appRouter.post('/download/:_id', dfgAsGraphml);
 
 
 app.use('/graph', appRouter); 

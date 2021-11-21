@@ -10,8 +10,19 @@ const logger = require('../log/log.js');
  */
 function filterGraph(graphJSON, variantsReq, sequenceReq) {
     logger.debug(`filter graph`);
-    filterConreteGraph(graphJSON["dfg"]["graph"], variantsReq, sequenceReq);
-    filterConreteGraph(graphJSON.epc.graph, variantsReq, sequenceReq); // TODO
+    if(!Array.isArray(variantsReq)){
+        throw Error("variants must be an array")
+    }
+    if(!(typeof sequenceReq === 'string' || sequenceReq instanceof String)){
+        throw Error("sequence must be an string")
+    }
+    if(graphJSON.hasOwnProperty("dfg")){
+        filterConreteGraph(graphJSON["dfg"]["graph"], variantsReq, sequenceReq);
+    }
+    if(graphJSON.hasOwnProperty("epc")){
+        filterConreteGraph(graphJSON["epc"]["graph"], variantsReq, sequenceReq); 
+    }
+
     //filterVariantsConrete(graphJSON.bpmn.graph, variants); // TODO
 
     return graphJSON
@@ -40,6 +51,9 @@ function filterConreteGraph(graphJSONconcrete, variantsReq, sequenceReq) {
         frequencyMap = getFrequencyMap(variantsGraphMap);
     } else {
         variantsReq = getVariantFromSequence(sequenceReq, variantsGraphMap);
+        if(typeof query == 'undefined' || query == null){
+            throw Error ('Sequence not found')
+        }
     }
     /** Iterate trough graph data. Use the filters, if available */
     sum = getEntityFrequency(graphJSONconcrete, frequencyMap, variantsReq, isReqEmpty, isSequenceEmpty, sequenceReq);

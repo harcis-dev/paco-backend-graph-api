@@ -11,8 +11,14 @@ const logger = require('../../utils/log/log.js');
  */
 
 function downloadDfgAsGraphml(request, response){
-    let query = {"_id": `${request.params.graphId}`}
+    if(!request["params"].hasOwnProperty('_id')){
+        return response.status(400).send("Error: Requestbody must contain _id");
+    }
+    let query = {"_id": `${request["params"]["_id"]}`}
     collection.findOne(query,(error, result) => {
+        if(typeof result == 'undefined' || result == null || result["matchedCount"] == 0){
+            return response.status(400).send("Error: No graph in database with provided _id");
+        }
         let variants = [];
         let sequence = "";
         if (error) {
@@ -20,15 +26,15 @@ function downloadDfgAsGraphml(request, response){
             return response.status(500).send(error);
         }
         /** @param {Array} variants - Filter with variants */
-        if("variants" in request.body){
-            variants = request.body.variants;
+        if("variants" in request["body"]){
+            variants = request["body"]["variants"];
         }
         logger.debug(`findOne: ${result}`);    
         try{
-            let graphId = result["_id"]
+            let _id = result["_id"]
             result = filterVariants(result, variants, "")
             let dfg = result["dfg"]["graph"]
-            response.send(convertDFG2Graphml(graphId, dfg));
+            response.send(convertDFG2Graphml(_id, dfg));
         }catch(error){
             logger.error(`${error}`);
             return response.status(500).send(`${error}`);

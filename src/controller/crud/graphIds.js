@@ -29,9 +29,16 @@ function getIdsAndVariants(result){
     for(let x of result){
         let id = x["_id"];
         let name = x["name"];
-        let variants = x["dfg"]["graph"][0]["data"]["variants"];
-        let variantsCount = Object.keys(variants).length;
-        idVariantsCount.push({"_id": id, "name": name, "variantsCount": variantsCount});
+        if(x["dfg"]["graph"][0]["data"].hasOwnProperty("variants")){
+            let variants = x["dfg"]["graph"][0]["data"]["variants"];
+            let variantsCount = Object.keys(variants).length;
+            idVariantsCount.push({"_id": id, "name": name, "variantsCount": variantsCount});
+        }else{
+            idVariantsCount.push({"_id": id, "name": name});
+        }
+        
+        
+        
     }
     return idVariantsCount;
 }
