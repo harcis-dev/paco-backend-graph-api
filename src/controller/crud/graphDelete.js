@@ -1,10 +1,7 @@
 const logger = require('../../utils/log/log.js');
 
 /**
- * Request for an graph with the given ID in MongoDB
- * Filter with the parameter in body:
- * - variants
- * - sequence
+ * Delete a graph with @param {String} _id
  */
 function deleteGraph(request, response) {
     let query = {"_id": `${request.params.graphId}`}

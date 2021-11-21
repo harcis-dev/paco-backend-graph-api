@@ -2,7 +2,7 @@ const jsonParser = require("../../utils/json/jsonParser.js")
 const logger = require('../../utils/log/log.js'); 
 
 /**
- * rename a graph with id: @param {String} _id and given name @param {String} name
+ * Rename a graph with id: @param {String} _id and given name @param {String} name
  */
 function renameGraph(request, response){
     let query = {"_id": `${request.params.graphId}`}

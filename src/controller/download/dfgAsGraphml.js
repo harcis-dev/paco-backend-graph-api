@@ -2,6 +2,14 @@ const filterVariants = require("../../utils/filter/filterGraph.js")
 const convertDFG2Graphml = require("../../utils/convert/dfgToGraphml.js")
 const logger = require('../../utils/log/log.js'); 
 
+/**
+ * Looking for the given @param {String} _id in database and converts to
+ * a xml-based graphml file.
+ * @see convertDFG2Graphml
+ * @param {*} request 
+ * @param {*} response 
+ */
+
 function downloadDfgAsGraphml(request, response){
     let query = {"_id": `${request.params.graphId}`}
     collection.findOne(query,(error, result) => {
