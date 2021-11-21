@@ -1,5 +1,5 @@
 
-const jsonParser = require("../../utils/json/jsonParser.js")
+const jsonParser = require("../../utils/json/jsonParser.js");
 const logger = require('../../utils/log/log.js'); 
 
 /**
