@@ -11,7 +11,7 @@ const logger = require('../log/log.js');
 function filterGraph(graphJSON, variantsReq, sequenceReq) {
     logger.debug(`filter graph`);
     filterConreteGraph(graphJSON["dfg"]["graph"], variantsReq, sequenceReq);
-    //filterVariantsConrete(graphJSON.epc.graph, variants); // TODO
+    filterConreteGraph(graphJSON.epc.graph, variantsReq, sequenceReq); // TODO
     //filterVariantsConrete(graphJSON.bpmn.graph, variants); // TODO
 
     return graphJSON
@@ -71,6 +71,9 @@ function getEntityFrequency(graphJSONconcrete, frequencyMap, variantsReq, isReqE
     for (var i = 0; i < graphJSONconcrete.length; i++) {
         let graphData = graphJSONconcrete[i]["data"];
         let variantsGraph = Object.keys(graphData["variants"]);
+        if(!graphData.hasOwnProperty("label")){
+            graphData["label"] = ""
+        }
         /** Filter for variants. Delete data if not requested */
         if (!(checkArrayItem(variantsGraph, variantsReq)) && !isReqEmpty) {
             graphJSONconcrete.splice(i, 1);
