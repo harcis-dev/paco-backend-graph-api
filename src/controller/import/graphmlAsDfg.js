@@ -3,6 +3,11 @@ const jsonParser = require("../../utils/json/jsonParser.js");
 const logger = require('../../utils/log/log.js'); 
 const convertGraphml2DFG = require("../../utils/convert/graphmlToDfg.js")
 
+/**
+ * Import XML-based graphml DFG, convert to JSON and persitant on databse
+ * @param {*} request 
+ * @param {*} response 
+ */
 function importGraphmlAsDfg(request, response){
     let _id = jsonParser(request.body, "_id")
     let name = _id;
