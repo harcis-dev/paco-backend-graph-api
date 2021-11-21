@@ -16,6 +16,10 @@ function mongoListener(){
         }
         database = client.db(mongodbName);
         collection = database.collection(mongodbCollection);
+        collection.createIndex( { "name": 1 }, { unique: true }, (error) =>   {
+                if (error) {
+            logger.error(`${error}`);
+        } });
         logger.info(`Connected to Database: ${mongodbName}. Collection: ${mongodbCollection}.`);
     });
 }

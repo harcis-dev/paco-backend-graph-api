@@ -7,7 +7,11 @@ const logger = require('../../utils/log/log.js');
  * return Response with accpeted or failed answer
  */
 function upsertGraph(request, response){
-    collection.replaceOne({"_id": `${jsonParser(request.body, "_id")}`}, request.body,{upsert: true}, (error, result) => {
+    _id = jsonParser(request.body, "_id")
+    if(!request.body.hasOwnProperty('name')){
+        request.body['name'] = _id
+    }
+    collection.replaceOne({"_id": `${_id}`}, request.body,{upsert: true}, (error, result) => {
         if (error) {
             logger.error(`${error}`);
             return response.status(500).send(error);

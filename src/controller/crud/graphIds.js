@@ -2,7 +2,10 @@
 const logger = require('../../utils/log/log.js');
 
 /**
- * Get all availibe ids from all graphs in database
+ * Get all availibe ids from all graphs in database,
+ * contains:
+ * - graph name
+ * - variantscount
  */
 function getGraphIds(request, response){
     collection.find().toArray(function(error, result) {
@@ -16,13 +19,19 @@ function getGraphIds(request, response){
     });
 }
 
+/**
+ * 
+ * @param {*} result 
+ * @returns 
+ */
 function getIdsAndVariants(result){
     let idVariantsCount = [];
     for(let x of result){
         let id = x["_id"];
+        let name = x["name"];
         let variants = x["dfg"]["graph"][0]["data"]["variants"];
         let variantsCount = Object.keys(variants).length;
-        idVariantsCount.push({"_id": id, "variantsCount": variantsCount});
+        idVariantsCount.push({"_id": id, "name": name, "variantsCount": variantsCount});
     }
     return idVariantsCount;
 }
