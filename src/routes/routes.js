@@ -9,28 +9,26 @@ const graphDelete = require('../controller/crud/graphDelete.js');
 const graphIds = require('../controller/crud/graphIds.js');               
 
 // ## Import
-const importGraphmlAsDfg = require('../controller/import/graphmlAsDfg.js');
-const importEpmlAsEpc = require('../controller/import/epmlAsEpc.js'); 
+const importGraph = require('../controller/import/importGraph.js'); 
 
 // ## Export
 const exportDfgAsGraphml = require('../controller/export/dfgAsGraphml.js');  
 const exportEpcAsEpml = require('../controller/export/epcAsEpml.js');        
 
 function setAppRouter(appRouter){
-    
+
     appRouter.use(express.json());
     appRouter.use(express.urlencoded({extended: true}));
     
+    // ## Import
+    appRouter.post('/import', importGraph);
+
     // ### CRUD
     appRouter.post('/', graphCreate);    
     appRouter.post('/:_id', graphRead);   
     appRouter.put('/:_id', graphRename);    
     appRouter.delete('/:_id', graphDelete);    
     appRouter.get('/ids', graphIds);
-
-    // ## Import
-    appRouter.post('/import', importGraphmlAsDfg);
-    appRouter.post('/import', importEpmlAsEpc);
 
     // ## Export    
     appRouter.post('/download/dfg/:_id', exportDfgAsGraphml);    
