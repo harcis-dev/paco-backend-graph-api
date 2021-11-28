@@ -34,8 +34,8 @@ function exportEpcAsEpml(request, response){
             let _id = result["_id"]
             let name = result["name"]
             result = filterVariants(result, variants, "")
-            let dfg = result["epc"]["graph"]
-            response.send(convertJsonToEpml(_id, name, dfg));
+            let epc = result["epc"]["graph"]
+            response.send(convertJsonToEpml(_id, name, epc));
         }catch(error){
             logger.error(`${error}`);
             return response.status(500).send(`${error}`);
