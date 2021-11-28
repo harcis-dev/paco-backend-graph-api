@@ -51,7 +51,7 @@ function filterConreteGraph(graphJSONconcrete, variantsReq, sequenceReq) {
         frequencyMap = getFrequencyMap(variantsGraphMap);
     } else {
         variantsReq = getVariantFromSequence(sequenceReq, variantsGraphMap);
-        if(typeof query == 'undefined' || query == null){
+        if(typeof variantsReq == 'undefined' || variantsReq == null){
             throw Error ('Sequence not found')
         }
     }
