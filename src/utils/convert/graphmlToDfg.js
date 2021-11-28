@@ -29,7 +29,7 @@ function convertGraphml2DFG(dfgXML) {
     for (edge of edgeList) {
         let source = edge["source"];
         let target = edge["target"];
-        if(edge.hasOwnProperty("$t")){      /** with label and variants */
+        if(edge["data"].hasOwnProperty("$t")){      /** with label and variants */
             let variants = JSON.parse(edge["data"]["$t"]);
             graphDataArray.push({ "data": { "source": source, "target": target, "label": "", "type": "DirectedEdge", "variants": variants } });         
         }else{                              /** only label */
