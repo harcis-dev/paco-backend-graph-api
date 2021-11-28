@@ -3,8 +3,8 @@ const logger = require('../../log/log.js');
 
 function convertJsonToEpml(_id, name, epc){
     logger.debug(`convert json to epml`);
-    let epmlDefinitionsString = `<definitions> <definition xmlns:addon="http://org.bflow.addon" defId="1"/>`;
-    let epmlDirectoryString = `<directory name="Root"> <epc epcId="1" name="${name}" IdBflow="1">`;
+    let epmlDefinitionsString = `<definitions> <definition xmlns:addon="http://org.bflow.addon" defId="${_id}"/>`;
+    let epmlDirectoryString = `<directory name="Root"> <epc epcId="${_id}" name="${name}" IdBflow="1">`;
 
     for (var i = 0; i < epc.length; i++) {
         
