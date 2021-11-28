@@ -5,7 +5,7 @@ const parser = require('xml2json');
  * @param {String} dfgXML 
  * @returns {Object} 
  */
-function convertGraphml2DFG(dfgXML) {
+function convertGraphml2Json(dfgXML) {
     let graphXml = dfgXML.replace("\$", "\"");
     let graphJson = JSON.parse(parser.toJson(graphXml));
 
@@ -29,7 +29,7 @@ function convertGraphml2DFG(dfgXML) {
     for (edge of edgeList) {
         let source = edge["source"];
         let target = edge["target"];
-        if(edge["data"].hasOwnProperty("$t")){      /** with label and variants */
+        if(edge.hasOwnProperty("data")){      /** with label and variants */
             let variants = JSON.parse(edge["data"]["$t"]);
             graphDataArray.push({ "data": { "source": source, "target": target, "label": "", "type": "DirectedEdge", "variants": variants } });         
         }else{                              /** only label */
@@ -41,4 +41,4 @@ function convertGraphml2DFG(dfgXML) {
 
 }
 
-module.exports = convertGraphml2DFG;
+module.exports = convertGraphml2Json;

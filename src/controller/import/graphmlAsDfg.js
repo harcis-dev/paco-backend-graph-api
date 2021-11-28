@@ -1,7 +1,7 @@
 
 const jsonParser = require("../../utils/json/jsonParser.js");
 const logger = require('../../utils/log/log.js'); 
-const convertGraphml2DFG = require("../../utils/convert/graphmlToDfg.js")
+const convertGraphml2Json = require("../../utils/convert/dfg/graphmlToJson.js");
 
 /**
  * Import XML-based graphml DFG, convert to JSON and persitant on databse
@@ -21,7 +21,7 @@ function importGraphmlAsDfg(request, response){
     }
     let name = request["body"]['name'];
 
-    let dfgJson = convertGraphml2DFG(request["body"]["dfg"]);
+    let dfgJson = convertGraphml2Json(request["body"]["dfg"]);
     collection.replaceOne({"_id": `${_id}`}, {"_id": `${_id}`,"name": name, "dfg": dfgJson},{upsert: true}, (error, result) => {
         if (error) {
             logger.error(`${error}`);

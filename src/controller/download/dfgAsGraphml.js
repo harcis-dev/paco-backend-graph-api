@@ -1,5 +1,5 @@
 const filterVariants = require("../../utils/filter/filterGraph.js")
-const convertDFG2Graphml = require("../../utils/convert/dfgToGraphml.js")
+const convertJson2Graphml = require("../../utils/convert/dfg/jsonToGraphml.js")
 const logger = require('../../utils/log/log.js'); 
 
 /**
@@ -34,7 +34,7 @@ function downloadDfgAsGraphml(request, response){
             let _id = result["_id"]
             result = filterVariants(result, variants, "")
             let dfg = result["dfg"]["graph"]
-            response.send(convertDFG2Graphml(_id, dfg));
+            response.send(convertJson2Graphml(_id, dfg));
         }catch(error){
             logger.error(`${error}`);
             return response.status(500).send(`${error}`);

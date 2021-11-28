@@ -1,4 +1,4 @@
-const logger = require('../log/log.js');
+const logger = require('../../log/log.js');
 
 /**
  * Convert dfg Object to graphml
@@ -6,7 +6,7 @@ const logger = require('../log/log.js');
  * @param {Object} dfg dfg-graph
  * @returns {String} Contains dfg in graphml format
  */
-function convertDFG2Graphml(_id, dfg) {
+function convertJson2Graphml(_id, dfg) {
     logger.debug(`convert dfg to graphml`);
     let xmlString = xmlHead;
     
@@ -49,4 +49,4 @@ const xmlHead = `<?xml version="1.0" encoding="UTF-8"?>
     http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
     <key attr.name="label" attr.type="string" for="node" id="label"/>`
 
-module.exports = convertDFG2Graphml;
+module.exports = convertJson2Graphml;
