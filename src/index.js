@@ -9,42 +9,17 @@ const appRouter = express.Router();
 // Run-Confgis
 const nodeEnv = process.env.NODE_ENV || 'development';
 const serverPort = process.env.SERVER_PORT || 8080;
+const setAppRouter = require('./routes/routes.js')
 
 // Database
 const mongoListener = require('./database/mongodb.js')
 
-// Controller
-const graphCreate = require('./controller/crud/graphCreate.js');            // POST
-const graphRead = require('./controller/crud/graphRead.js');                // POST
-const graphRename = require('./controller/crud/graphRename.js');            // PUT
-const graphDelete = require('./controller/crud/graphDelete.js');            // DELETE
-const graphIds = require('./controller/crud/graphIds.js');                  // GET
-const dfgAsGraphml = require('./controller/download/dfgAsGraphml.js');      // POST 
-const graphmlAsDfg = require('./controller/import/graphmlAsDfg.js');        // POST
 // Logging
 const logger = require('./utils/log/log.js'); 
 
-
 app.listen(serverPort, mongoListener);
 
-appRouter.use(express.json());
-appRouter.use(express.urlencoded({extended: true}));
-
-// Routes
-appRouter.post('/', graphCreate);
-
-appRouter.post('/import', graphmlAsDfg);
-
-appRouter.post('/:_id', graphRead);
-
-appRouter.put('/:_id', graphRename);
-
-appRouter.delete('/:_id', graphDelete);
-
-appRouter.get('/ids', graphIds);
-
-appRouter.post('/download/:_id', dfgAsGraphml);
-
+setAppRouter(appRouter);
 
 app.use('/graph', appRouter); 
 
