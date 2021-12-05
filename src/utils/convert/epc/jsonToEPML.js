@@ -1,40 +1,44 @@
 const logger = require('../../log/log.js');
 
 
-function convertJsonToEpml(_id, name, epc){
+function convertJsonToEpml(_id, name, epc) {
     logger.debug(`convert json to epml`);
     let epmlDefinitionsString = `<definitions> <definition xmlns:addon="http://org.bflow.addon" defId="${_id}"/>`;
     let epmlDirectoryString = `<directory name="Root"> <epc epcId="${_id}" name="${name}" IdBflow="1">`;
 
     for (var i = 0; i < epc.length; i++) {
-        
-        
+      
         let graphData = epc[i]["data"];
-        let variants = JSON.stringify(graphData["variants"]).replace(/\"/g, "'"); 
-        if (!graphData.hasOwnProperty("target")){   /** Is node */       
+        let hasVariants = graphData.hasOwnProperty("variants");
+        let variants = {};
+        if (hasVariants) {
+            variants = JSON.stringify(graphData["variants"]).replace(/\"/g, "'");
+        }
+
+        if (!graphData.hasOwnProperty("target")) {   /** Is node */
             let id = graphData["id"];
             let type = graphData["type"].toLowerCase();
-            let label = graphData["label"].split("\n");              
-            epmlDirectoryString += `<${type} id="${id}" IdBflow="${i+2}" defRef="${i+3}">`;
-            if(type != "and" && type != "or" && type != "xor"){
+            let label = graphData["label"].split("\n");
+            epmlDirectoryString += `<${type} id="${id}" IdBflow="${i + 2}" defRef="${i + 3}">`;
+            if (type != "and" && type != "or" && type != "xor") {
                 epmlDefinitionsString += `<definition xmlns:addon="http://org.bflow.addon" defId="${id}"/>`;
                 epmlDirectoryString += `<name xmlns:addon="http://org.bflow.addon">${label}</name>`;
+            }
+            if (hasVariants) {
                 epmlDirectoryString += `<attribute typeRef ="variants" value ="${variants}"/>`;
-            }    
-                                                    
+            }
+
             epmlDirectoryString += `</${type}>`
 
-        }else{                                      /** Is edge */
+        } else {                                      /** Is edge */
             let source = graphData["source"];
             let target = graphData["target"];
-            epmlDirectoryString += `<arc id="${i+2}" IdBflow="${i+2}">
+            epmlDirectoryString += `<arc id="${i + 2}" IdBflow="${i + 2}">
                                 <flow source="${source}" target="${target}"/>`;
-            epmlDirectoryString += `<attribute typeRef ="variants" value ="${variants}"/>`;
+            if (hasVariants) {
+                epmlDirectoryString += `<attribute typeRef ="variants" value ="${variants}"/>`;
+            }
             epmlDirectoryString += `</arc>`;
-            
-/*             if (hasVariants){
-                epmlString += `<data key="variants">${variants}</data>\n`
-            } */
         }
     }
     epmlDefinitionsString += `</definitions>`;
