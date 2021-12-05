@@ -16,12 +16,16 @@ function convertJson2Graphml(_id, dfg) {
     }
     xmlString += `<graph id="${_id}" edgedefault="directed">`
     for (var i = 0; i < dfg.length; i++) {
+
         let graphData = dfg[i]["data"];
         hasVariants = graphData.hasOwnProperty("variants");
         let variants = JSON.stringify(graphData["variants"]);
+
         if (!graphData.hasOwnProperty("target")){
+
             let id = graphData["id"];
-            let label = graphData["label"].split("\n");;            
+            let label = graphData["label"].split("\n");;  
+
             xmlString += `<node id="${id}">\n`
             xmlString += `<data key="label">${label[0]}</data>\n`
             if (hasVariants){
@@ -29,8 +33,10 @@ function convertJson2Graphml(_id, dfg) {
             }
             xmlString += `</node>`
         }else{
+
             let source = graphData["source"];
             let target = graphData["target"];
+            
             xmlString += `<edge id="${i}" source="${source}" target="${target}">`
             if (hasVariants){
                 xmlString += `<data key="variants">${variants}</data>\n`
