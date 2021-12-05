@@ -10,15 +10,16 @@ function convertJsonToEpml(_id, name, epc){
         
         
         let graphData = epc[i]["data"];
-
+        let variants = JSON.stringify(graphData["variants"]).replace(/\"/g, "'"); 
         if (!graphData.hasOwnProperty("target")){   /** Is node */       
             let id = graphData["id"];
             let type = graphData["type"].toLowerCase();
-            let label = graphData["label"].split("\n");;            
+            let label = graphData["label"].split("\n");              
             epmlDirectoryString += `<${type} id="${id}" IdBflow="${i+2}" defRef="${i+3}">`;
             if(type != "and" && type != "or" && type != "xor"){
                 epmlDefinitionsString += `<definition xmlns:addon="http://org.bflow.addon" defId="${id}"/>`;
                 epmlDirectoryString += `<name xmlns:addon="http://org.bflow.addon">${label}</name>`;
+                epmlDirectoryString += `<attribute typeRef ="variants" value ="${variants}"/>`;
             }    
                                                     
             epmlDirectoryString += `</${type}>`
@@ -27,8 +28,10 @@ function convertJsonToEpml(_id, name, epc){
             let source = graphData["source"];
             let target = graphData["target"];
             epmlDirectoryString += `<arc id="${i+2}" IdBflow="${i+2}">
-                            <flow source="${source}" target="${target}"/>
-                            </arc>`
+                                <flow source="${source}" target="${target}"/>`;
+            epmlDirectoryString += `<attribute typeRef ="variants" value ="${variants}"/>`;
+            epmlDirectoryString += `</arc>`;
+            
 /*             if (hasVariants){
                 epmlString += `<data key="variants">${variants}</data>\n`
             } */
