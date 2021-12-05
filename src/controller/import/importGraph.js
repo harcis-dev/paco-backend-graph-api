@@ -1,6 +1,7 @@
 const jsonParser = require("../../utils/json/jsonParser.js");
 const logger = require('../../utils/log/log.js'); 
-const convertGraphml2Json = require("../../utils/convert/dfg/graphmlToJson.js");
+const convertGraphmlToJson = require("../../utils/convert/dfg/graphmlToJson.js");
+const convertEpmlToJson = require("../../utils/convert/epc/epmlToJson.js");
 
 /**
  * Import XML-based graphml DFG, convert to JSON and persitant on databse
@@ -25,13 +26,13 @@ function importGraph(request, response){
 
     switch(modell){
         case "dfg":
-            graphJson = convertGraphml2Json(request["body"]["dfg"]);
+            graphJson = convertGraphmlToJson(request["body"]["dfg"]);
             break;
         case "epc":
-            graphJson = convertGraphml2Json(request["body"]["epc"]);
+            graphJson = convertEpmlToJson(request["body"]["epc"]);
             break;
         case "bpmn":
-            graphJson = convertGraphml2Json(request["body"]["bpmn"]);
+            //graphJson = convertGraphml2Json(request["body"]["bpmn"]);
             break;
     }
     query = {"_id": `${_id}`,"name": name, [modell]: graphJson};
