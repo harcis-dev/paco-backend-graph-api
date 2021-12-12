@@ -4,6 +4,7 @@
   "description": "REST-API between Frontend and Graph Database",
   "main": "src/index.js",
   "scripts": {
+    "beautify": "find src -type f -name *.js -exec js-beautify -r {} ;",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon src/index.js",
     "doc": "jsdoc -c jsdoc.json",
