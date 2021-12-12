@@ -1,5 +1,6 @@
 /**
- * @file API - main and routes
+ * @file API - main
+ * @author HARCIS-DEV TEAM
  */
 
 const express = require('express');
@@ -15,12 +16,12 @@ const setAppRouter = require('./routes/routes.js')
 const mongoListener = require('./database/mongodb.js')
 
 // Logging
-const logger = require('./utils/log/log.js'); 
+const logger = require('./utils/log/log.js');
 
 app.listen(serverPort, mongoListener);
 
 setAppRouter(appRouter);
 
-app.use('/graph', appRouter); 
+app.use('/graph', appRouter);
 
 logger.info(`Service started in ${nodeEnv}-Mode on Port ${serverPort}`);

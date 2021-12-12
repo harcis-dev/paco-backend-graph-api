@@ -1,6 +1,6 @@
 const filterVariants = require("../../utils/filter/filterGraph.js")
 const convertJsonToEpml = require("../../utils/convert/epc/jsonToEpml.js")
-const logger = require('../../utils/log/log.js'); 
+const logger = require('../../utils/log/log.js');
 
 /**
  * Looking for the given @param {String} _id in database and converts to
@@ -10,13 +10,15 @@ const logger = require('../../utils/log/log.js');
  * @param {*} response 
  */
 
-function exportEpcAsEpml(request, response){
-    if(!request["params"].hasOwnProperty('_id')){
+function exportEpcAsEpml(request, response) {
+    if (!request["params"].hasOwnProperty('_id')) {
         return response.status(400).send("Error: Requestbody must contain _id");
     }
-    let query = {"_id": `${request["params"]["_id"]}`}
-    collection.findOne(query,(error, result) => {
-        if(typeof result == 'undefined' || result == null || result["matchedCount"] == 0){
+    let query = {
+        "_id": `${request["params"]["_id"]}`
+    }
+    collection.findOne(query, (error, result) => {
+        if (typeof result == 'undefined' || result == null || result["matchedCount"] == 0) {
             return response.status(400).send("Error: No graph in database with provided _id");
         }
         let variants = [];
@@ -26,21 +28,21 @@ function exportEpcAsEpml(request, response){
             return response.status(500).send(error);
         }
         /** @param {Array} variants - Filter with variants */
-        if("variants" in request["body"]){
+        if ("variants" in request["body"]) {
             variants = request["body"]["variants"];
         }
-        logger.debug(`findOne: ${result}`);    
-        try{
+        logger.debug(`findOne: ${result}`);
+        try {
             let _id = result["_id"]
             let name = result["name"]
             result = filterVariants(result, variants, "")
             let epc = result["epc"]["graph"]
             response.send(convertJsonToEpml(_id, name, epc));
-        }catch(error){
+        } catch (error) {
             logger.error(`${error}`);
             return response.status(500).send(`${error}`);
         }
-        
+
     });
 }
 

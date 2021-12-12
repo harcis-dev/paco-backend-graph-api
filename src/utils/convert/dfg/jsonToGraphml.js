@@ -1,3 +1,8 @@
+/**
+ * @file Converts dfg json to graphml
+ * @author HARCIS-DEV TEAM
+ */
+
 const logger = require('../../log/log.js');
 
 /**
@@ -9,9 +14,9 @@ const logger = require('../../log/log.js');
 function convertJson2Graphml(_id, dfg) {
     logger.debug(`convert dfg to graphml`);
     let xmlString = xmlHead;
-    
-    if (dfg[0]["data"].hasOwnProperty("variants")){
-        xmlString +='<key attr.name="variants" attr.type="string" for="node" id="variants" />\
+
+    if (dfg[0]["data"].hasOwnProperty("variants")) {
+        xmlString += '<key attr.name="variants" attr.type="string" for="node" id="variants" />\
         <key attr.name="variants" attr.type="string" for="edge" id="variants" />'
     }
     xmlString += `<graph id="${_id}" edgedefault="directed">`
@@ -21,24 +26,24 @@ function convertJson2Graphml(_id, dfg) {
         hasVariants = graphData.hasOwnProperty("variants");
         let variants = JSON.stringify(graphData["variants"]);
 
-        if (!graphData.hasOwnProperty("target")){
+        if (!graphData.hasOwnProperty("target")) {
 
             let id = graphData["id"];
-            let label = graphData["label"].split("\n");;  
+            let label = graphData["label"].split("\n");;
 
             xmlString += `<node id="${id}">\n`
             xmlString += `<data key="label">${label[0]}</data>\n`
-            if (hasVariants){
+            if (hasVariants) {
                 xmlString += `<data key="variants">${variants}</data>\n`
             }
             xmlString += `</node>`
-        }else{
+        } else {
 
             let source = graphData["source"];
             let target = graphData["target"];
-            
+
             xmlString += `<edge id="${i}" source="${source}" target="${target}">`
-            if (hasVariants){
+            if (hasVariants) {
                 xmlString += `<data key="variants">${variants}</data>\n`
             }
             xmlString += `</edge>`

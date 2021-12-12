@@ -1,3 +1,8 @@
+/**
+ * @file Converts dfg json to graphml
+ * @author HARCIS-DEV TEAM
+ */
+
 const parser = require('xml2json');
 
 /**
@@ -14,19 +19,34 @@ function convertGraphml2Json(dfgXML) {
     let nodeList = graphJson["graphml"]["graph"]["node"];
     for (node of nodeList) {
         let id = node["id"];
-        if(node["data"] instanceof Array){  /** with label and variants */
+        if (node["data"] instanceof Array) {
+            /** with label and variants */
 
-            let label = node["data"][0]["$t"]; 
+            let label = node["data"][0]["$t"];
             let variants = JSON.parse(node["data"][1]["$t"]);
 
-            graphDataArray.push({ "data": { "id": id, "label": label, "type": "node", "variants": variants } })
-        }else{                              /** only label */
+            graphDataArray.push({
+                "data": {
+                    "id": id,
+                    "label": label,
+                    "type": "node",
+                    "variants": variants
+                }
+            })
+        } else {
+            /** only label */
 
             let label = node["data"]["$t"];
 
-            graphDataArray.push({ "data": { "id": id, "label": label, "type": "node"} })
+            graphDataArray.push({
+                "data": {
+                    "id": id,
+                    "label": label,
+                    "type": "node"
+                }
+            })
         }
-        
+
     }
 
     let edgeList = graphJson["graphml"]["graph"]["edge"];
@@ -35,17 +55,36 @@ function convertGraphml2Json(dfgXML) {
         let source = edge["source"];
         let target = edge["target"];
 
-        if(edge.hasOwnProperty("data")){      /** with label and variants */
+        if (edge.hasOwnProperty("data")) {
+            /** with label and variants */
 
             let variants = JSON.parse(edge["data"]["$t"]);
-            
-            graphDataArray.push({ "data": { "source": source, "target": target, "label": "", "type": "DirectedEdge", "variants": variants } });         
-        }else{                              /** only label */
-            graphDataArray.push({ "data": { "source": source, "target": target, "label": "", "type": "DirectedEdge"} });
-        }  
+
+            graphDataArray.push({
+                "data": {
+                    "source": source,
+                    "target": target,
+                    "label": "",
+                    "type": "DirectedEdge",
+                    "variants": variants
+                }
+            });
+        } else {
+            /** only label */
+            graphDataArray.push({
+                "data": {
+                    "source": source,
+                    "target": target,
+                    "label": "",
+                    "type": "DirectedEdge"
+                }
+            });
+        }
     }
 
-    return { "graph": graphDataArray };
+    return {
+        "graph": graphDataArray
+    };
 
 }
 
