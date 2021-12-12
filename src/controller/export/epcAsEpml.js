@@ -1,3 +1,8 @@
+/**
+ * @file Export epc json
+ * @author HARCIS-DEV TEAM
+ */
+
 const filterVariants = require("../../utils/filter/filterGraph.js")
 const convertJsonToEpml = require("../../utils/convert/epc/jsonToEpml.js")
 const logger = require('../../utils/log/log.js');

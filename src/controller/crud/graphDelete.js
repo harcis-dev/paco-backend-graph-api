@@ -1,3 +1,8 @@
+/**
+ * @file Controller for deleting graph
+ * @author HARCIS-DEV TEAM
+ */
+
 const logger = require('../../utils/log/log.js');
 
 /**

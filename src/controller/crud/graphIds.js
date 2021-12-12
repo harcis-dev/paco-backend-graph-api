@@ -1,3 +1,8 @@
+/**
+ * @file Controller for reading graph ids with name and variantcounts 
+ * @author HARCIS-DEV TEAM
+ */
+
 const logger = require('../../utils/log/log.js');
 
 /**
@@ -14,16 +19,16 @@ function getGraphIds(request, response) {
         }
         logger.debug(`find: ${result}`);
 
-        response.send(getIdsAndVariants(result));
+        response.send(getIdsNamesAndVariantCounts(result));
     });
 }
 
 /**
- * 
- * @param {*} result 
- * @returns 
+ * Selecting id, name and variantscount of a grapg
+ * @param {object} result - All objects from database
+ * @returns {object}
  */
-function getIdsAndVariants(result) {
+function getIdsNamesAndVariantCounts(result) {
     let idVariantsCount = [];
     for (let graphs of result) {
         let id = graphs["_id"];

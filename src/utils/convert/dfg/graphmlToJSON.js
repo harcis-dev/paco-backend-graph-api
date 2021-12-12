@@ -1,5 +1,5 @@
 /**
- * @file Converts dfg json to graphml
+ * @file Converts graphml to json format
  * @author HARCIS-DEV TEAM
  */
 

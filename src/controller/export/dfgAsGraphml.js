@@ -1,3 +1,8 @@
+/**
+ * @file Export dfg json
+ * @author HARCIS-DEV TEAM
+ */
+
 const filterVariants = require("../../utils/filter/filterGraph.js")
 const convertJson2Graphml = require("../../utils/convert/dfg/jsonToGraphml.js")
 const logger = require('../../utils/log/log.js');

@@ -1,3 +1,8 @@
+/**
+ * @file Controller for renaming graph
+ * @author HARCIS-DEV TEAM
+ */
+
 const jsonUtils = require("../../utils/jsonUtils.js")
 const logger = require('../../utils/log/log.js');
 

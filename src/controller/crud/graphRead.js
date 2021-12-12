@@ -1,3 +1,8 @@
+/**
+ * @file Controller for reading graph
+ * @author HARCIS-DEV TEAM
+ */
+
 const filterGraph = require("../../utils/filter/filterGraph.js")
 
 const logger = require('../../utils/log/log.js');

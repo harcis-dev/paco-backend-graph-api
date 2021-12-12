@@ -187,6 +187,14 @@ function getEntityFrequency(graphJSONconcrete, frequencyMap, variantsReq, isReqE
     };
 }
 
+/**
+ * Check if type is:
+ * - "or"
+ * - "and"
+ * - "xor"
+ * @param {string} type 
+ * @returns {boolean} 
+ */
 function isOperator(type) {
     type = type.toLowerCase();
     return type === "or" || type === "and" || type === "xor";

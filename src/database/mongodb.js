@@ -1,3 +1,8 @@
+/**
+ * @file Connection to Mongo Database
+ * @author HARCIS-DEV TEAM
+ */
+
 const mongoClient = require('mongodb').MongoClient;
 const mongodbHost = process.env.MONGODB_DOMAIN || "127.0.0.1";
 const mongodbPort = process.env.MONGODB_PORT || "27017";
@@ -8,6 +13,9 @@ const mongodbCollection = process.env.MONGODB_COLLECTION || 'graph-collection';
 
 const logger = require('../utils/log/log.js');
 
+/**
+ * Creates connection to Mongo Database
+ */
 function mongoListener() {
     mongoClient.connect(mongodbUrl, {
         useNewUrlParser: true

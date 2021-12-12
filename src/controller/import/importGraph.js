@@ -1,10 +1,18 @@
+/**
+ * @file Import structures for:
+ * - json {dfg, epc, bpmn}
+ * - graphml {dfg}
+ * - epml {epc}
+ * @author HARCIS-DEV TEAM
+ */
+
 const jsonUtils = require("../../utils/jsonUtils.js");
 const logger = require('../../utils/log/log.js');
 const convertGraphmlToJson = require("../../utils/convert/dfg/graphmlToJson.js");
 const convertEpmlToJson = require("../../utils/convert/epc/epmlToJson.js");
 
 /**
- * Import XML-based graphml DFG, convert to JSON and persitant on databse
+ * Import any given graph to database
  * @param {*} request 
  * @param {*} response 
  */
