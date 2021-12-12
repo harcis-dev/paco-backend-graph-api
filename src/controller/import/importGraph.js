@@ -1,5 +1,5 @@
-const jsonParser = require("../../utils/json/jsonParser.js");
-const logger = require('../../utils/log/log.js'); 
+const jsonUtils = require("../../utils/jsonUtils.js");
+const logger = require('../../utils/log/log.js');
 const convertGraphmlToJson = require("../../utils/convert/dfg/graphmlToJson.js");
 const convertEpmlToJson = require("../../utils/convert/epc/epmlToJson.js");
 
@@ -8,23 +8,23 @@ const convertEpmlToJson = require("../../utils/convert/epc/epmlToJson.js");
  * @param {*} request 
  * @param {*} response 
  */
-function importGraph(request, response){
-    if(!request["body"].hasOwnProperty('_id')){
+function importGraph(request, response) {
+    if (!request["body"].hasOwnProperty('_id')) {
         return response.status(400).send("Error: Requestbody must contain _id");
     }
     modell = checkForModell(request);
-    if(!modell){
+    if (!modell) {
         return response.status(400).send("Error: Requestbody must contain dfg, epc or bpmn");
     }
-    let _id = jsonParser(request["body"], "_id")
-    if(!request["body"].hasOwnProperty('name')){
+    let _id = jsonUtils.getKeyFromJsonString(request["body"], "_id")
+    if (!request["body"].hasOwnProperty('name')) {
         request["body"]['name'] = _id
     }
     let name = request["body"]['name'];
 
     let graphJson;
 
-    switch(modell){
+    switch (modell) {
         case "dfg":
             graphJson = convertGraphmlToJson(request["body"]["dfg"]);
             break;
@@ -35,8 +35,16 @@ function importGraph(request, response){
             //graphJson = convertGraphml2Json(request["body"]["bpmn"]);
             break;
     }
-    query = {"_id": `${_id}`,"name": name, [modell]: graphJson};
-    collection.replaceOne({"_id": `${_id}`}, query, {upsert: true}, (error, result) => {
+    query = {
+        "_id": `${_id}`,
+        "name": name,
+        [modell]: graphJson
+    };
+    collection.replaceOne({
+        "_id": `${_id}`
+    }, query, {
+        upsert: true
+    }, (error, result) => {
         if (error) {
             logger.error(`${error}`);
             return response.status(500).send(error);
@@ -46,14 +54,14 @@ function importGraph(request, response){
     });
 }
 
-function checkForModell(request){
-    if(request["body"].hasOwnProperty('dfg')){
+function checkForModell(request) {
+    if (request["body"].hasOwnProperty('dfg')) {
         return "dfg";
     }
-    if(request["body"].hasOwnProperty('epc')){
+    if (request["body"].hasOwnProperty('epc')) {
         return "epc";
     }
-    if(request["body"].hasOwnProperty('bpmn')){
+    if (request["body"].hasOwnProperty('bpmn')) {
         return "bpmn";
     }
     return "";

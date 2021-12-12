@@ -1,8 +1,17 @@
-const isEmptyObject = require("../json/jsonEmpty.js")
+/**
+ * @file Filter graph with parameters
+ * @author HARCIS-DEV TEAM
+ */
+
+const jsonUtils = require("../jsonUtils.js")
 const nodeEnv = process.env.NODE_ENV || 'development';
 const logger = require('../log/log.js');
 
-const graphTypeEnum = Object.freeze({ DFG: 1, EPC: 2, BPMN: 3 });
+const graphTypeEnum = Object.freeze({
+    DFG: 1,
+    EPC: 2,
+    BPMN: 3
+});
 
 /**
  * Filter all the given graph with requestparameters
@@ -34,17 +43,18 @@ function filterGraph(graphJSON, variantsReq, sequenceReq) {
 /**
  * Filter one concrete graph
  * @param {Object} graphJSON - complete graph
- * @param {Array|String} variantsReq - Array of given variants to filter - Changes to String if sequence is given
+ * @param {Array | String} variantsReq - Array of given variants to filter - Changes to String if sequence is given
  * @param {String} sequenceReq - on sequence to filter, sequence got a higher priority, 
  * thats why sequence will overwrite variants-Array
  */
 function filterConreteGraph(graphJSONconcrete, variantsReq, sequenceReq, graphType) {
-    if (!graphJSONconcrete[0]["data"].hasOwnProperty("variants")) { /** No variants and sequences availible to filter */
+    if (!graphJSONconcrete[0]["data"].hasOwnProperty("variants")) {
+        /** No variants and sequences availible to filter */
         return;
     }
-    let isSequenceEmpty = isEmptyObject(sequenceReq);
+    let isSequenceEmpty = jsonUtils.isEmptyObject(sequenceReq);
     /** Check if Request is empty -> do not filter  */
-    let isReqEmpty = isEmptyObject(variantsReq) && isSequenceEmpty;
+    let isReqEmpty = jsonUtils.isEmptyObject(variantsReq) && isSequenceEmpty;
     let frequencyMap = {};
     let variantsGraphMap = graphJSONconcrete[0]["data"]["variants"];
 
@@ -61,7 +71,8 @@ function filterConreteGraph(graphJSONconcrete, variantsReq, sequenceReq, graphTy
     /** Iterate trough graph data. Use the filters, if available */
     sum = getEntityFrequency(graphJSONconcrete, frequencyMap, variantsReq, isReqEmpty, isSequenceEmpty, sequenceReq, graphType);
 
-    if (isSequenceEmpty) {  /** If empty, add arrowwidth on edges */
+    if (isSequenceEmpty) {
+        /** If empty, add arrowwidth on edges */
         let smallestSum = sum["smallestSum"];
         let biggestSum = sum["biggestSum"];
         let frequencyArrowwidth = sum["frequencyArrowwidth"];
@@ -110,36 +121,44 @@ function getEntityFrequency(graphJSONconcrete, frequencyMap, variantsReq, isReqE
                 continue;
             }
 
-            if(graphEntityData.hasOwnProperty("source") && graphEntityData.hasOwnProperty("target")){
+            if (graphEntityData.hasOwnProperty("source") && graphEntityData.hasOwnProperty("target")) {
                 let source = graphEntityData["source"];
                 let target = graphEntityData["target"];
 
                 if (deletedOperatorIds.includes(source)) {
-                    markedIndexTarget.push({ "i": i });
+                    markedIndexTarget.push({
+                        "i": i
+                    });
                 }
-    
+
                 if (deletedOperatorIds.includes(target)) {
                     graphJSONconcrete.splice(i, 1);
                     i--;
-                    markedIndexSource.push({ "source": source });
+                    markedIndexSource.push({
+                        "source": source
+                    });
                 }
             }
         }
 
-        if (isSequenceEmpty) {  /** Analyse Entities and get frequency for every entity */
+        if (isSequenceEmpty) {
+            /** Analyse Entities and get frequency for every entity */
             let sum = 0;
             for (const [key, value] of Object.entries(frequencyMap)) {
                 if (dataEntityVariants.includes(key) && (variantsReq.includes(key) || isReqEmpty)) {
                     sum += value;
                 }
             }
-            if (!frequencyArrowwidth.includes(sum)) {    /** Check if sum-Value already in "Set-Array" */
+            if (!frequencyArrowwidth.includes(sum)) {
+                /** Check if sum-Value already in "Set-Array" */
                 frequencyArrowwidth.push(sum);
             }
             let newLine = "";
-            if (graphEntityData.hasOwnProperty("target")) { /** Is the element an edge */
+            if (graphEntityData.hasOwnProperty("target")) {
+                /** Is the element an edge */
                 graphEntityData["sum"] = sum;
-            } else {                                 /** The element is a node  */
+            } else {
+                /** The element is a node  */
                 newLine = "\n";
             }
 
@@ -161,7 +180,11 @@ function getEntityFrequency(graphJSONconcrete, frequencyMap, variantsReq, isReqE
     for (var i = 0; i < deletedOperatorIds.length; i++) {
         graphJSONconcrete[markedIndexTarget[i]["i"]]["data"]["source"] = markedIndexSource[i]["source"]
     }
-    return { "biggestSum": biggestSum, "smallestSum": smallestSum, "frequencyArrowwidth": frequencyArrowwidth };
+    return {
+        "biggestSum": biggestSum,
+        "smallestSum": smallestSum,
+        "frequencyArrowwidth": frequencyArrowwidth
+    };
 }
 
 function isOperator(type) {
@@ -177,14 +200,16 @@ function isOperator(type) {
 function setGraphArrowwidth(graphJSONconcrete, spacingWidthArray) {
     for (var i = 0; i < graphJSONconcrete.length; i++) {
         let graphData = graphJSONconcrete[i]["data"];
-        if (graphData.hasOwnProperty("target")) { /** Is edge */
+        if (graphData.hasOwnProperty("target")) {
+            /** Is edge */
             for (value of spacingWidthArray) {
-                if (graphData["sum"] <= parseInt(value)) {  /** check if sum of element is smaller or equal of given sum values */
-                    graphData["width"] = spacingWidthArray.indexOf(value) + 1;  /** add index of value as arrowwidth to element */
+                if (graphData["sum"] <= parseInt(value)) {
+                    /** check if sum of element is smaller or equal of given sum values */
+                    graphData["width"] = spacingWidthArray.indexOf(value) + 1; /** add index of value as arrowwidth to element */
                     if (nodeEnv === 'production') {
                         delete graphJSONconcrete[i]["data"]["sum"];
                     }
-                    break;      /** appropriate value found */
+                    break; /** appropriate value found */
                 }
             }
         }
@@ -213,12 +238,13 @@ function getSpacingWidth(smallestSum, biggestSum, frequencyArrowwidth) {
     let frequencyArrowwidthLength = frequencyArrowwidth.length;
     let sum = biggestSum - smallestSum;
 
-    if (frequencyArrowwidthLength <= 10) {  /** Only max. 10 diffrent sum-Values in set-array */
+    if (frequencyArrowwidthLength <= 10) {
+        /** Only max. 10 diffrent sum-Values in set-array */
         for (let i = 0; i <= frequencyArrowwidthLength; i++) {
             spacingWidthArray.push(frequencyArrowwidth[i]);
         }
     } else {
-        let value = sum / 10            /** Grading arrowwith for every 1/10 of sum  */
+        let value = sum / 10 /** Grading arrowwith for every 1/10 of sum  */
 
         for (let i = 1; i <= 10; i++) {
             spacingWidthArray.push(Math.round(value * i));
@@ -245,7 +271,7 @@ function checkArrayItem(target, source) {
 function getFrequencyMap(variants) {
     let keys = Object.keys(variants);
     let frequencyMap = {};
-    keys.forEach(function (key) {
+    keys.forEach(function(key) {
         frequencyMap[key] = Object.keys(variants[key]).length;
     });
     return frequencyMap;

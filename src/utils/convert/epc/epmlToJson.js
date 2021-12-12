@@ -1,7 +1,13 @@
+/**
+ * @file Converts epml to a json formatted epc graph
+ * @author HARCIS-DEV TEAM
+ */
+
 const parser = require('xml2json');
+const jsonUtils = require('../../jsonUtils');
 
 /**
- * Convert the given epml-String to an epc graph object 
+ * Convert the given epml to an epc graph object 
  * @param {String} epml 
  * @returns {Object} epc-graph
  */
@@ -25,7 +31,9 @@ function convertEpmlToJson(epml) {
     /** Edge */
     graphDataArray = graphDataArray.concat(addEdgesToGraphData(epmlNodeList, "ControlFlow"));
 
-    return { "graph": graphDataArray };
+    return {
+        "graph": graphDataArray
+    };
 
 }
 
@@ -42,20 +50,35 @@ function addEntitysToGraphData(entityList, entityType) {
 
     graphDataArrayTemp = []
 
-    if (isArray(entityList)) {
+    if (Array.isArray(entityList)) {
         for (entity of entityList) {
 
             let id = entity["id"];
             let label = "";
 
-            if(entity.hasOwnProperty("name")){
+            if (entity.hasOwnProperty("name")) {
                 label = entity["name"]["$t"];
             }
-            if (entity.hasOwnProperty("attribute") && entity["attribute"]["typeRef"] === "variants") {  /** with label and variants */
+            if (entity.hasOwnProperty("attribute") && entity["attribute"]["typeRef"] === "variants") {
+                /** with label and variants */
                 let variants = JSON.parse(entity["attribute"]["value"].replace(/'/g, "\""));
-                graphDataArrayTemp.push({ "data": { "id": id, "label": label, "type": entityType, "variants": variants } })
-            } else {                                                                                    /** only label */
-                graphDataArrayTemp.push({ "data": { "id": id, "label": label, "type": entityType } })
+                graphDataArrayTemp.push({
+                    "data": {
+                        "id": id,
+                        "label": label,
+                        "type": entityType,
+                        "variants": variants
+                    }
+                })
+            } else {
+                /** only label */
+                graphDataArrayTemp.push({
+                    "data": {
+                        "id": id,
+                        "label": label,
+                        "type": entityType
+                    }
+                })
             }
 
         }
@@ -64,14 +87,29 @@ function addEntitysToGraphData(entityList, entityType) {
         let id = entityList["id"];
         let label = "";
 
-        if(entityList.hasOwnProperty("name")){
+        if (entityList.hasOwnProperty("name")) {
             label = entityList["name"]["$t"];
-        }    
-        if (entityList.hasOwnProperty("attribute") && entityList["attribute"]["typeRef"] === "variants") {  /** with label and variants */
+        }
+        if (entityList.hasOwnProperty("attribute") && entityList["attribute"]["typeRef"] === "variants") {
+            /** with label and variants */
             let variants = JSON.parse(entityList["attribute"]["value"].replace(/'/g, "\""));
-            graphDataArrayTemp.push({ "data": { "id": id, "label": label, "type": entityType, "variants": variants } })
-        } else {                                                                                            /** only label */
-            graphDataArrayTemp.push({ "data": { "id": id, "label": label, "type": entityType } })
+            graphDataArrayTemp.push({
+                "data": {
+                    "id": id,
+                    "label": label,
+                    "type": entityType,
+                    "variants": variants
+                }
+            })
+        } else {
+            /** only label */
+            graphDataArrayTemp.push({
+                "data": {
+                    "id": id,
+                    "label": label,
+                    "type": entityType
+                }
+            })
         }
     }
 
@@ -88,40 +126,67 @@ function addEntitysToGraphData(entityList, entityType) {
 function addEdgesToGraphData(edgeList, edgeType) {
 
     graphDataArrayTemp = []
-    if (isArray(edgeList)) {
+    if (Array.isArray(edgeList)) {
         for (epmlEdge of edgeList) {
             let source = epmlEdge["flow"]["source"];
             let target = epmlEdge["flow"]["target"];
 
-            if (epmlEdge.hasOwnProperty("attribute") && epmlEdge["attribute"]["typeRef"] === "variants") {      /** with label and variants */
+            if (epmlEdge.hasOwnProperty("attribute") && epmlEdge["attribute"]["typeRef"] === "variants") {
+                /** with label and variants */
                 let variants = JSON.parse(epmlEdge["attribute"]["value"].replace(/'/g, "\""));
-                graphDataArrayTemp.push({ "data": { "source": source, "target": target, "label": "", "type": edgeType, "variants": variants } });
-            } else {                                                                                            /** only label */
-                graphDataArrayTemp.push({ "data": { "source": source, "target": target, "label": "", "type": edgeType } });
+                graphDataArrayTemp.push({
+                    "data": {
+                        "source": source,
+                        "target": target,
+                        "label": "",
+                        "type": edgeType,
+                        "variants": variants
+                    }
+                });
+            } else {
+                /** only label */
+                graphDataArrayTemp.push({
+                    "data": {
+                        "source": source,
+                        "target": target,
+                        "label": "",
+                        "type": edgeType
+                    }
+                });
             }
         }
     } else {
         let source = edgeList["flow"]["source"];
         let target = edgeList["flow"]["target"];
 
-        if (edgeList.hasOwnProperty("attribute") && edgeList["attribute"]["typeRef"] === "variants") {      /** with label and variants */
+        if (edgeList.hasOwnProperty("attribute") && edgeList["attribute"]["typeRef"] === "variants") {
+            /** with label and variants */
             let variants = JSON.parse(edgeList["attribute"]["value"].replace(/'/g, "\""));
-            graphDataArrayTemp.push({ "data": { "source": source, "target": target, "label": "", "type": edgeType, "variants": variants } });
-        } else {                                                                                            /** only label */
-            graphDataArrayTemp.push({ "data": { "source": source, "target": target, "label": "", "type": edgeType } });
+            graphDataArrayTemp.push({
+                "data": {
+                    "source": source,
+                    "target": target,
+                    "label": "",
+                    "type": edgeType,
+                    "variants": variants
+                }
+            });
+        } else {
+            /** only label */
+            graphDataArrayTemp.push({
+                "data": {
+                    "source": source,
+                    "target": target,
+                    "label": "",
+                    "type": edgeType
+                }
+            });
         }
     }
 
     return graphDataArrayTemp;
 }
 
-/**
- * Check if a object is a array
- * @param {*} object 
- * @returns {boolean} 
- */
-function isArray(object) {
-    return Object.prototype.toString.call(object) === '[object Array]';
-}
+
 
 module.exports = convertEpmlToJson;
