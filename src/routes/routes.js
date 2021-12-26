@@ -5,19 +5,21 @@
 
 const express = require('express');
 // ## Controller
-// ### CRUD
-const graphCreate = require('../controller/crud/graphCreate.js');
-const graphRead = require('../controller/crud/graphRead.js');
-const graphRename = require('../controller/crud/graphRename.js');
-const graphDelete = require('../controller/crud/graphDelete.js');
-const graphIds = require('../controller/crud/graphIds.js');
+// ### Graph
+// #### CRUD
+const graphCreate = require('../controller/graph/crud/graphCreate.js');
+const graphRead = require('../controller/graph/crud/graphRead.js');
+const graphRename = require('../controller/graph/crud/graphRename.js');
+const graphDelete = require('../controller/graph/crud/graphDelete.js');
+const graphIds = require('../controller/graph/crud/graphIds.js');
 
-// ## Import
-const importGraph = require('../controller/import/importGraph.js');
+// #### Import
+const importGraph = require('../controller/graph/import/importGraph.js');
 
-// ## Export
-const exportDfgAsGraphml = require('../controller/export/dfgAsGraphml.js');
-const exportEpcAsEpml = require('../controller/export/epcAsEpml.js');
+// #### Export
+const exportDfgAsGraphml = require('../controller/graph/export/dfgAsGraphml.js');
+const exportEpcAsEpml = require('../controller/graph/export/epcAsEpml.js');
+
 /**
  * Setting routes for App with express.Router
  * @param {express.Router} appRouter 
@@ -28,6 +30,8 @@ function setAppRouter(appRouter) {
     appRouter.use(express.urlencoded({
         extended: true
     }));
+
+    // # graph
 
     // ## Import
     appRouter.post('/import', importGraph);
@@ -42,6 +46,7 @@ function setAppRouter(appRouter) {
     // ## Export    
     appRouter.post('/download/dfg/:_id', exportDfgAsGraphml);
     appRouter.post('/download/epc/:_id', exportEpcAsEpml);
+
 }
 
 module.exports = setAppRouter;

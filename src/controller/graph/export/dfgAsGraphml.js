@@ -3,9 +3,12 @@
  * @author HARCIS-DEV TEAM
  */
 
-const filterVariants = require("../../utils/filter/filterGraph.js")
-const convertJson2Graphml = require("../../utils/convert/dfg/jsonToGraphml.js")
-const logger = require('../../utils/log/log.js');
+const filterVariants = require("../../../utils/filter/filterGraph.js")
+const convertJson2Graphml = require("../../../utils/convert/dfg/jsonToGraphml.js")
+const logger = require('../../../utils/log/log.js');
+
+// Database
+const mongodb = require('../../../database/mongodb.js')
 
 /**
  * Looking for the given @param {String} _id in database and converts to
@@ -22,7 +25,8 @@ function exportDfgAsGraphml(request, response) {
     let query = {
         "_id": `${request["params"]["_id"]}`
     }
-    collection.findOne(query, (error, result) => {
+    let database = mongodb.getDatabase();
+    database.collection(mongodb.mongodbGraphCollection).findOne(query, (error, result) => {
         if (typeof result == 'undefined' || result == null || result["matchedCount"] == 0) {
             return response.status(400).send("Error: No graph in database with provided _id");
         }

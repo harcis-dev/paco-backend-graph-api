@@ -3,8 +3,11 @@
  * @author HARCIS-DEV TEAM
  */
 
-const jsonUtils = require("../../utils/jsonUtils.js")
-const logger = require('../../utils/log/log.js');
+// Database
+const mongodb = require('../../../database/mongodb.js')
+
+const jsonUtils = require("../../../utils/jsonUtils.js")
+const logger = require('../../../utils/log/log.js');
 
 /**
  * Rename a graph with id: @param {String} _id and given name @param {String} name
@@ -16,7 +19,8 @@ function renameGraph(request, response) {
     if (!request["body"].hasOwnProperty("name")) {
         return response.status(400).send("Error: Provide name as key value pair");
     }
-    collection.updateOne(query, {
+    let database = mongodb.getDatabase();
+    database.collection(mongodb.mongodbGraphCollection).updateOne(query, {
         "$set": {
             "name": `${jsonUtils.getKeyFromJsonString(request["body"], "name")}`
         }

@@ -6,10 +6,13 @@
  * @author HARCIS-DEV TEAM
  */
 
-const jsonUtils = require("../../utils/jsonUtils.js");
-const logger = require('../../utils/log/log.js');
-const convertGraphmlToJson = require("../../utils/convert/dfg/graphmlToJson.js");
-const convertEpmlToJson = require("../../utils/convert/epc/epmlToJson.js");
+// Database
+const mongodb = require('../../../database/mongodb.js')
+
+const jsonUtils = require("../../../utils/jsonUtils.js");
+const logger = require('../../../utils/log/log.js');
+const convertGraphmlToJson = require("../../../utils/convert/dfg/graphmlToJson.js");
+const convertEpmlToJson = require("../../../utils/convert/epc/epmlToJson.js");
 
 /**
  * Import any given graph to database
@@ -48,7 +51,8 @@ function importGraph(request, response) {
         "name": name,
         [modell]: graphJson
     };
-    collection.replaceOne({
+    let database = mongodb.getDatabase();
+    database.collection(mongodb.mongodbGraphCollection).replaceOne({
         "_id": `${_id}`
     }, query, {
         upsert: true

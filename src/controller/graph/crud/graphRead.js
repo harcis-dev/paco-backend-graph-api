@@ -3,9 +3,12 @@
  * @author HARCIS-DEV TEAM
  */
 
-const filterGraph = require("../../utils/filter/filterGraph.js")
+// Database
+const mongodb = require('../../../database/mongodb.js')
 
-const logger = require('../../utils/log/log.js');
+const filterGraph = require("../../../utils/filter/filterGraph.js")
+
+const logger = require('../../../utils/log/log.js');
 
 /**
  * Request for an graph with the given ID in MongoDB
@@ -17,7 +20,8 @@ function getGraph(request, response) {
     let query = {
         "_id": `${request["params"]["_id"]}`
     };
-    collection.findOne(query, (error, result) => {
+    let database = mongodb.getDatabase();
+    database.collection(mongodb.mongodbGraphCollection).findOne(query, (error, result) => {
         if (typeof result == 'undefined' || result == null) {
             return response.status(400).send("Error: No graph in database with provided _id");
         }

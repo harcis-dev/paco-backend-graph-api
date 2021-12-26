@@ -3,8 +3,11 @@
  * @author HARCIS-DEV TEAM
  */
 
-const jsonUtils = require("../../utils/jsonUtils.js");
-const logger = require('../../utils/log/log.js');
+const jsonUtils = require("../../../utils/jsonUtils.js");
+const logger = require('../../../utils/log/log.js');
+
+// Database
+const mongodb = require('../../../database/mongodb.js')
 
 /**
  * Insert graph with @param {String} _id if not exist, Replace graph if @param {String} _id exist
@@ -18,7 +21,9 @@ function upsertGraph(request, response) {
     if (!request["body"].hasOwnProperty('name')) {
         request["body"]['name'] = _id
     }
-    collection.replaceOne({
+    delete request["body"]["_id"]
+    let database = mongodb.getDatabase();
+    database.collection(mongodb.mongodbGraphCollection).replaceOne({
         "_id": `${_id}`
     }, request["body"], {
         upsert: true

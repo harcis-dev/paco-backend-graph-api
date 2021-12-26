@@ -3,7 +3,10 @@
  * @author HARCIS-DEV TEAM
  */
 
-const logger = require('../../utils/log/log.js');
+// Database
+const mongodb = require('../../../database/mongodb.js')
+
+const logger = require('../../../utils/log/log.js');
 
 /**
  * Get all availibe ids from all graphs in database,
@@ -12,7 +15,8 @@ const logger = require('../../utils/log/log.js');
  * - variantscount
  */
 function getGraphIds(request, response) {
-    collection.find().toArray(function(error, result) {
+    let database = mongodb.getDatabase();
+    database.collection(mongodb.mongodbGraphCollection).find().toArray(function(error, result) {
         if (error) {
             logger.error(`${error}`);
             return response.status(500).send(error);
