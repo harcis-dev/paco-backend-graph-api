@@ -11,5 +11,5 @@
 /docs
 /logs
 /node_modules
-
+/upload
 .env

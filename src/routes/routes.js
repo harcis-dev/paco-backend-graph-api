@@ -3,9 +3,20 @@
  * @author HARCIS-DEV TEAM
  */
 
+
 const express = require('express');
+const multer = require('multer');
+var storage = multer.diskStorage({
+    destination: './upload',
+    filename: function (req, file, cb) {
+        cb(null , file.originalname.split(".")[0] + "_" + Date.now() + ".csv");
+    }
+});
+const upload = multer({ storage: storage});
 // ## Controller
+
 // ### Graph
+
 // #### CRUD
 const graphCreate = require('../controller/graph/crud/graphCreate.js');
 const graphRead = require('../controller/graph/crud/graphRead.js');
@@ -20,6 +31,18 @@ const importGraph = require('../controller/graph/import/importGraph.js');
 const exportDfgAsGraphml = require('../controller/graph/export/dfgAsGraphml.js');
 const exportEpcAsEpml = require('../controller/graph/export/epcAsEpml.js');
 
+// ### CSV
+
+// #### CRUD
+const csvDelete = require('../controller/csv/crud/csvDelete.js');
+const csvIds = require('../controller/csv/crud/csvIds.js');
+
+// #### Import
+const csvImport = require('../controller/csv/import/csvImport.js');
+
+// #### Export
+const csvExport = require('../controller/csv/export/csvExport.js');
+
 /**
  * Setting routes for App with express.Router
  * @param {express.Router} appRouter 
@@ -31,10 +54,14 @@ function setAppRouter(appRouter) {
         extended: true
     }));
 
+    //appRouter.use(upload.array()); 
+    appRouter.use(express.static('public'));
+
     // # graph
 
     // ## Import
     appRouter.post('/import', importGraph);
+
 
     // ### CRUD
     appRouter.post('/', graphCreate);
@@ -47,6 +74,15 @@ function setAppRouter(appRouter) {
     appRouter.post('/download/dfg/:_id', exportDfgAsGraphml);
     appRouter.post('/download/epc/:_id', exportEpcAsEpml);
 
+    // # CSV
+    // ## CRUD
+    appRouter.get('/csv/ids', csvIds);
+    appRouter.delete('/csv/:_id', csvDelete);
+    // ## Import
+    appRouter.post('/csv/import', upload.single('file'), csvImport);
+    appRouter.get('/csv/download/:_id', csvExport);
+
+    
 }
 
 module.exports = setAppRouter;
