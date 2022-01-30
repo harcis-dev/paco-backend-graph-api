@@ -36,6 +36,7 @@ const exportEpcAsEpml = require('../controller/graph/export/epcAsEpml.js');
 // #### CRUD
 const csvDelete = require('../controller/csv/crud/csvDelete.js');
 const csvIds = require('../controller/csv/crud/csvIds.js');
+const csvPreview = require('../controller/csv/crud/csvPreview.js');
 
 // #### Import
 const csvImport = require('../controller/csv/import/csvImport.js');
@@ -78,6 +79,7 @@ function setAppRouter(appRouter) {
     // ## CRUD
     appRouter.get('/csv/ids', csvIds);
     appRouter.delete('/csv/:_id', csvDelete);
+    appRouter.get('/csv/preview/:_id', csvPreview);
     // ## Import
     appRouter.post('/csv/import', upload.single('file'), csvImport);
     appRouter.get('/csv/download/:_id', csvExport);

@@ -5,6 +5,8 @@
 
 const fs = require('fs');
 
+const mongoose = require('mongoose');
+
 // Database
 const mongodb = require('../../../database/mongodb.js')
 
@@ -15,7 +17,7 @@ const logger = require('../../../utils/log/log.js');
  */
 function csvDelete(request, response) {
     let query = {
-        "_id": `${request["params"]["_id"]}`
+        "_id": mongoose.Types.ObjectId(request["params"]["_id"])
     }
     let database = mongodb.getDatabase();
     database.collection(mongodb.mongodbCsvCollection).findOne(query, (error, result) => {
