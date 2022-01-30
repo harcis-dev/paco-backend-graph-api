@@ -7,6 +7,13 @@ const express = require('express');
 const app = express();
 const appRouter = express.Router();
 const mongodb = require('./database/mongodb.js')
+const cors = require("cors")
+
+app.use(
+  cors({
+    origin: "*"
+  })
+)
 
 // Run-Confgis
 const nodeEnv = process.env.NODE_ENV || 'development';
