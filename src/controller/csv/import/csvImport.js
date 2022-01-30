@@ -19,27 +19,18 @@ function csvImport(request, response) {
 
     var file_path = request.file.path;
 
-    if (!(Object.prototype.hasOwnProperty.call(request["body"], '_id'))) {
-        fs.unlinkSync(file_path);
-        return response.status(400).send("Error: Requestbody must contain _id");
-    }
-    _id = jsonUtils.getKeyFromJsonString(request["body"], "_id")
-    if (!(Object.prototype.hasOwnProperty.call(request["body"], 'name'))) {
-        request["body"]['name'] = _id
-    }
     if (!(Object.prototype.hasOwnProperty.call(request, 'file'))) {
         fs.unlinkSync(file_path);
         return response.status(400).send("Error: Requestbody must contain file");
     }
 
     object = {
-        "_id": `${_id}`,
         "name": `${request["body"]['name']}`,
         "path": `${file_path}`
     }
 
     let database = mongodb.getDatabase();
-    database.collection(mongodb.mongodbCsvCollection).insert(object, (error, result) => {
+    database.collection(mongodb.mongodbCsvCollection).insertOne(object, (error, result) => {
         if (error) {
             fs.unlinkSync(file_path);
             logger.error(`${error}`);
