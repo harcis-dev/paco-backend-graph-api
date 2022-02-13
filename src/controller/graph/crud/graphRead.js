@@ -44,7 +44,8 @@ function getGraph(request, response) {
             response.send(filterGraph(result, variants, sequence));
         } catch (error) {
             logger.error(`${error}`);
-            return response.status(400).send(`${error}`);
+            logger.error(`${error.stack}`);
+            return response.status(400).send(`${error.stack}`);
         }
 
     });
