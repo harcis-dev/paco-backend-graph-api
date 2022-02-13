@@ -34,8 +34,9 @@ function filterGraph(graphJSON, variantsReq, sequenceReq) {
     if (graphJSON.hasOwnProperty("epc")) {
         filterConreteGraph(graphJSON["epc"]["graph"], variantsReq, sequenceReq, graphTypeEnum.EPC);
     }
-
-    //filterVariantsConrete(graphJSON.bpmn.graph, variants); // TODO
+    if (graphJSON.hasOwnProperty("bpmn")) {
+        filterConreteGraph(graphJSON["bpmn"]["graph"], variantsReq, sequenceReq, graphTypeEnum.BPMN);
+    }
 
     return graphJSON
 }
@@ -114,7 +115,33 @@ function getEntityFrequency(graphJSONconcrete, frequencyMap, variantsReq, isReqE
         }
 
         if (isOperatorIrrelevant && graphType === graphTypeEnum.EPC) {
-            if (isOperator(graphEntityData["type"])) {
+            if (isOperatorEPC(graphEntityData["type"])) {
+                deletedOperatorIds.push(graphEntityData["id"]);
+                graphJSONconcrete.splice(i, 1);
+                i--;
+                continue;
+            }
+
+            if (graphEntityData.hasOwnProperty("source") && graphEntityData.hasOwnProperty("target")) {
+                let source = graphEntityData["source"];
+                let target = graphEntityData["target"];
+
+                if (deletedOperatorIds.includes(source)) {
+                    markedIndexTarget.push({
+                        "i": i
+                    });
+                }
+
+                if (deletedOperatorIds.includes(target)) {
+                    graphJSONconcrete.splice(i, 1);
+                    i--;
+                    markedIndexSource.push({
+                        "source": source
+                    });
+                }
+            }
+        }else if (isOperatorIrrelevant && graphType === graphTypeEnum.BPMN) {
+            if (isOperatorEPC(graphEntityData["type"])) {
                 deletedOperatorIds.push(graphEntityData["id"]);
                 graphJSONconcrete.splice(i, 1);
                 i--;
@@ -177,7 +204,7 @@ function getEntityFrequency(graphJSONconcrete, frequencyMap, variantsReq, isReqE
             delete graphJSONconcrete[i]["data"]["variants"];
         }
     }
-    for (var i = 0; i < deletedOperatorIds.length; i++) {
+    for (let i = 0; i < markedIndexTarget.length; i++) {
         graphJSONconcrete[markedIndexTarget[i]["i"]]["data"]["source"] = markedIndexSource[i]["source"]
     }
     return {
@@ -195,9 +222,21 @@ function getEntityFrequency(graphJSONconcrete, frequencyMap, variantsReq, isReqE
  * @param {string} type 
  * @returns {boolean} 
  */
-function isOperator(type) {
+function isOperatorEPC(type) {
     type = type.toLowerCase();
     return type === "or" || type === "and" || type === "xor";
+}
+
+/**
+ * Check if type is:
+ * - "Parallel"
+ * - "Exclusive"
+ * - "Inclusive"
+ * @param {string} type 
+ * @returns {boolean} 
+ */
+ function isOperatorEPC(type) {
+    return type === "Parallel" || type === "Exclusive" || type === "Inclusive";
 }
 
 /**
