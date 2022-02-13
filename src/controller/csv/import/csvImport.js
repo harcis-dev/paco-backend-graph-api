@@ -34,7 +34,7 @@ function csvImport(request, response) {
 
     let headerColumns = rows[0].split(',');
     for (let i = 0; i < headerColumns.length; i++) {
-        headerColumns[i] = headerColumns[i].replace(/[^a-zA-Z0-9]/g, '');
+        headerColumns[i] = headerColumns[i].replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
     }
 
     if(!headerColumns.includes('caseid')){
