@@ -75,9 +75,9 @@ function filterConreteGraph(graphJSONconcrete, variantsReq, sequenceReq, graphTy
         /** If empty, add arrowwidth on edges */
         let smallestSum = sum["smallestSum"];
         let biggestSum = sum["biggestSum"];
-        let frequencyArrowwidth = sum["frequencyArrowwidth"];
-        let spacingWidthArray = getSpacingWidth(smallestSum, biggestSum, frequencyArrowwidth);
-        setGraphArrowwidth(graphJSONconcrete, spacingWidthArray);
+        let frequencyArrowWidth = sum["frequencyArrowWidth"];
+        let spacingWidthArray = getSpacingWidth(smallestSum, biggestSum, frequencyArrowWidth);
+        setGraphArrowWidth(graphJSONconcrete, spacingWidthArray);
     }
 }
 
@@ -93,7 +93,7 @@ function filterConreteGraph(graphJSONconcrete, variantsReq, sequenceReq, graphTy
  * @returns {Object} parameters, for arrowwidth handling
  */
 function getEntityFrequency(graphJSONconcrete, frequencyMap, variantsReq, isReqEmpty, isSequenceEmpty, sequenceReq, graphType) {
-    let frequencyArrowwidth = [];
+    let frequencyArrowWidth = [];
     let smallestSum = Number.MAX_VALUE;
     let biggestSum = 0;
     let deletedOperatorIds = [];
@@ -149,9 +149,9 @@ function getEntityFrequency(graphJSONconcrete, frequencyMap, variantsReq, isReqE
                     sum += value;
                 }
             }
-            if (!frequencyArrowwidth.includes(sum)) {
+            if (!frequencyArrowWidth.includes(sum)) {
                 /** Check if sum-Value already in "Set-Array" */
-                frequencyArrowwidth.push(sum);
+                frequencyArrowWidth.push(sum);
             }
             let newLine = "";
             if (graphEntityData.hasOwnProperty("target")) {
@@ -183,7 +183,7 @@ function getEntityFrequency(graphJSONconcrete, frequencyMap, variantsReq, isReqE
     return {
         "biggestSum": biggestSum,
         "smallestSum": smallestSum,
-        "frequencyArrowwidth": frequencyArrowwidth
+        "frequencyArrowWidth": frequencyArrowWidth
     };
 }
 
@@ -205,7 +205,7 @@ function isOperator(type) {
  * @param {Object} graphJSONconcrete 
  * @param {Array} spacingWidthArray 
  */
-function setGraphArrowwidth(graphJSONconcrete, spacingWidthArray) {
+function setGraphArrowWidth(graphJSONconcrete, spacingWidthArray) {
     for (var i = 0; i < graphJSONconcrete.length; i++) {
         let graphData = graphJSONconcrete[i]["data"];
         if (graphData.hasOwnProperty("target")) {
@@ -230,7 +230,7 @@ function setGraphArrowwidth(graphJSONconcrete, spacingWidthArray) {
  * @returns {Boolean} 
  */
 function isStartOrEndNode(graphDataLabel) {
-    return graphDataLabel === "Start" && graphDataLabel === "End";
+    return graphDataLabel === "Start" || graphDataLabel === "End";
 }
 
 /**
@@ -238,25 +238,31 @@ function isStartOrEndNode(graphDataLabel) {
  * to get a naive gradation between arrow width
  * @param {Number} smallestSum  smallest analysed sum
  * @param {Number} biggestSum biggest analysed sum
- * @param {Array} frequencyArrowwidth Array Set with diffrent sum
+ * @param {Array} frequencyArrowWidth Array Set with diffrent sum
  * @returns {Array} Array with distance lengths
  */
-function getSpacingWidth(smallestSum, biggestSum, frequencyArrowwidth) {
-    let spacingWidthArray = [];
-    let frequencyArrowwidthLength = frequencyArrowwidth.length;
-    let sum = biggestSum - smallestSum;
+function getSpacingWidth(smallestSum, biggestSum, frequencyArrowWidth) {
 
-    if (frequencyArrowwidthLength <= 10) {
-        /** Only max. 10 diffrent sum-Values in set-array */
-        for (let i = 0; i <= frequencyArrowwidthLength; i++) {
-            spacingWidthArray.push(frequencyArrowwidth[i]);
+    const sumValues = 10;
+    
+    let spacingWidthArray = [];
+    let frequencyArrowWidthLength = frequencyArrowWidth.length;
+    let sum = biggestSum - smallestSum;
+    
+
+    if (frequencyArrowWidthLength <= sumValues) {
+        /** Only max. sumValues diffrent sum-Values in set-array */
+        for (let i = 0; i <= frequencyArrowWidthLength; i++) {
+            spacingWidthArray.push(frequencyArrowWidth[i]);
         }
     } else {
-        let value = sum / 10 /** Grading arrowwith for every 1/10 of sum  */
+        let value = sum / sumValues /** Grading arrowwith for every 1/sumValues of sum  */
 
-        for (let i = 1; i <= 10; i++) {
+        for (let i = 1; i <= sumValues; i++) {
             spacingWidthArray.push(Math.round(value * i));
         }
+
+        spacingWidthArray[spacingWidthArray.length-1] = biggestSum + 1;
     }
     return spacingWidthArray.sort();
 }
