@@ -328,9 +328,11 @@ function getEntityFrequency(
             graphJSONconcrete.splice(edgeElement["edgeIndex"] - substractIndex, 1);
             substractIndex++;
           }
+          let operatorProperties = graphJSONconcrete[edgeObject["operatorIndex"]];
+          let operatorSum = parseInt((operatorProperties["data"]["label"]).split("\n")[1]);
           graphJSONconcrete.splice(edgeObject["operatorIndex"], 1);
           newEgdeID = `${source}->${target}`;
-          let newEdge = {"data":{"id": newEgdeID, "source": source, "target": target, "type": "InformationFlow", "variants":edgeObject["operatorVariants"] }};
+          let newEdge = {"data":{"id": newEgdeID, "source": source, "target": target, "type": "InformationFlow","sum": operatorSum, "label": operatorSum, "variants":edgeObject["operatorVariants"] }};
           graphJSONconcrete.push(newEdge);
 
       }
