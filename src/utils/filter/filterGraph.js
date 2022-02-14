@@ -208,32 +208,6 @@ function getEntityFrequency(
            * Individual check whether the respective operators are required.
            */
         }else{
-            if (isOperatorEPC(graphEntityDataType)){
-                markedOperatorsIndexMap[graphEntityDataID] = i;
-            } else if(isInformationFlowEPC(graphEntityDataType)){
-                let edgeContainsOperator = false;
-                let operatorID = "";
-                let graphEntityDataSource = graphEntityData["source"];
-                let graphEntityDataTarget = graphEntityData["target"];
-                if(Object.keys(markedOperatorsIndexMap).includes(graphEntityDataSource)){
-                    edgeContainsOperator = true;
-                    operatorID = graphEntityDataSource;
-                }else if(Object.keys(markedOperatorsIndexMap).includes(graphEntityDataTarget)){
-                    edgeContainsOperator = true;
-                    operatorID = graphEntityDataTarget;
-                }
-                if(edgeContainsOperator){
-                    let edgeElement = {"edgeID": graphEntityDataID, "edgeIndex": i, "source": graphEntityDataSource, "target": graphEntityDataTarget};
-                    let operatorObject = {"operatorIndex": markedOperatorsIndexMap[operatorID],"operatorVariants": graphEntityData["variants"], "edgeArray":[edgeElement]};
-                    if(Object.keys(markedOperatorsMap).includes(operatorID)){
-                        let operatorEdgeArray = markedOperatorsMap[operatorID]["edgeArray"];
-                        operatorEdgeArray.push(edgeElement);
-                        operatorObject["edgeArray"] = operatorEdgeArray;                       
-                    } 
-                    markedOperatorsMap[operatorID] = operatorObject;               
-                }
-
-            }
             
         }
       } else if (isOperatorIrrelevant && graphType === graphTypeEnum.BPMN) {
@@ -266,6 +240,37 @@ function getEntityFrequency(
           }
         }
       }
+
+      if((graphType === graphTypeEnum.EPC || graphType === graphTypeEnum.BPMN) && !isOperatorIrrelevant){
+        if (isOperatorEPC(graphEntityDataType) || isOperatorBPMN(graphEntityDataType)){
+          markedOperatorsIndexMap[graphEntityDataID] = i;
+      } else if(isInformationFlowEPC(graphEntityDataType) || isStandardEdgeBBPMN(graphEntityDataType)){
+          let edgeContainsOperator = false;
+          let operatorID = "";
+          let graphEntityDataSource = graphEntityData["source"];
+          let graphEntityDataTarget = graphEntityData["target"];
+          if(Object.keys(markedOperatorsIndexMap).includes(graphEntityDataSource)){
+              edgeContainsOperator = true;
+              operatorID = graphEntityDataSource;
+          }else if(Object.keys(markedOperatorsIndexMap).includes(graphEntityDataTarget)){
+              edgeContainsOperator = true;
+              operatorID = graphEntityDataTarget;
+          }
+          if(edgeContainsOperator){
+              let edgeElement = {"edgeID": graphEntityDataID, "edgeIndex": i, "source": graphEntityDataSource, "target": graphEntityDataTarget};
+              let operatorObject = {"operatorIndex": markedOperatorsIndexMap[operatorID],"operatorVariants": graphEntityData["variants"], "edgeArray":[edgeElement]};
+              if(Object.keys(markedOperatorsMap).includes(operatorID)){
+                  let operatorEdgeArray = markedOperatorsMap[operatorID]["edgeArray"];
+                  operatorEdgeArray.push(edgeElement);
+                  operatorObject["edgeArray"] = operatorEdgeArray;                       
+              } 
+              markedOperatorsMap[operatorID] = operatorObject;               
+          }
+
+      }
+      }
+
+
     }
 
       if (isSequenceEmpty) {
@@ -332,7 +337,14 @@ function getEntityFrequency(
           let operatorSum = parseInt((operatorProperties["data"]["label"]).split("\n")[1]);
           graphJSONconcrete.splice(edgeObject["operatorIndex"], 1);
           newEgdeID = `${source}->${target}`;
-          let newEdge = {"data":{"id": newEgdeID, "source": source, "target": target, "type": "InformationFlow","sum": operatorSum, "label": operatorSum, "variants":edgeObject["operatorVariants"] }};
+          let newEdge = {};
+          if(graphType == graphTypeEnum.EPC){
+            newEdge = {"data":{"id": newEgdeID, "source": source, "target": target, "type": "InformationFlow","sum": operatorSum, "label": operatorSum, "variants":edgeObject["operatorVariants"] }};
+          }else if(graphType == graphTypeEnum.BPMN){
+            newEdge = {"data":{"id": newEgdeID, "source": source, "target": target, "type": "StandardEdge","sum": operatorSum, "label": operatorSum, "variants":edgeObject["operatorVariants"] }};
+          }
+
+          
           graphJSONconcrete.push(newEdge);
 
       }
@@ -358,6 +370,9 @@ function getEntityFrequency(
  * @returns {boolean}
  */
 function isOperatorEPC(type) {
+  if (!type){
+    return false;
+  }
   type = type.toLowerCase();
   return type === "or" || type === "and" || type === "xor";
 }
@@ -369,7 +384,23 @@ function isOperatorEPC(type) {
  * @returns {boolean}
  */
 function isInformationFlowEPC(type){
+  if (!type){
+    return false;
+  }
     return type.toLowerCase() == "informationflow";
+}
+
+/**
+ * Check if type is:
+ * - "standardedge"
+ * @param {string} type
+ * @returns {boolean}
+ */
+ function isStandardEdgeBBPMN(type){
+  if (!type){
+    return false;
+  }
+  return type.toLowerCase() == "standardedge";
 }
 
 /**
@@ -381,6 +412,9 @@ function isInformationFlowEPC(type){
  * @returns {boolean}
  */
 function isOperatorBPMN(type) {
+  if (!type){
+    return false;
+  }
   return type === "Parallel" || type === "Exclusive" || type === "Inclusive";
 }
 
