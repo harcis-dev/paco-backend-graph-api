@@ -1,5 +1,5 @@
 /**
- * @file // TODO
+ * @file Show preview of csv table
  * @author HARCIS-DEV TEAM
  */
 
@@ -11,6 +11,10 @@
  const fs = require('fs')
  const mongoose = require('mongoose');
  
+/**
+ * Show preview of csv table
+ * @return
+ */
  function csvPreview(request, response) {
    
     let query = {

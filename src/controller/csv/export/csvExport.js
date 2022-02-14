@@ -1,5 +1,5 @@
 /**
- * @file // TODO
+ * @file Controller to export csv-files
  * @author HARCIS-DEV TEAM
  */
 const jsonUtils = require("../../../utils/jsonUtils.js");
@@ -11,8 +11,9 @@ var fs = require('fs');
 
 
 /**
- * // TODO
+ * Download csv-file with provided @param {String} _id
  * 
+ * Source:
  * https://medium.com/@svibhuti22/file-upload-with-multer-in-node-js-and-express-5bc76073419f
  */
 function csvExport(request, response) {

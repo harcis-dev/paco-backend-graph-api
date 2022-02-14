@@ -134,18 +134,45 @@ function getEntityFrequency(
   graphType
 ) {
   let frequencyEdgeWidth = [];
+  /**
+   * Determine the smallest pass numbers for later determination of the arrow size.
+   */
   let smallestSum = Number.MAX_VALUE;
+  /**
+   * Determine the biggest pass numbers for later determination of the arrow size.
+   */
   let biggestSum = 0;
+  /**
+   * Array in which the deleted operator ids are present if @isOperatorIrrelevant is true.
+   */
   let deletedOperatorIds = [];
+  /**
+   * Marked places of the origin nodes
+   */
   let markedIndexSource = [];
+  /**
+   * Marked locations of the target nodes
+   */
   let markedIndexTarget = [];
+  /**
+   * With only one variant, all operators are deleted.
+   */
   let isOperatorIrrelevant = !isSequenceEmpty || variantsReq.length == 1;
-  let areAllVariantsRepresented = (
+  /**
+   * If all variants are present, filtering of operators is skipped.
+   */
+  let areAllVariantsRepresented =
     variantsReq.length == 0 ||
-    variantsReq.length == graphJSONconcrete[0]["data"]["variants"].length
-  );
+    variantsReq.length == graphJSONconcrete[0]["data"]["variants"].length;
+  /**
+   * Contains ID of the operator, as well as the index in the graph
+   */
   let markedOperatorsIndexMap = {};
+  /**
+   * Contains the information of an operator, as well as the related edges
+   */
   let markedOperatorsMap = {};
+
   for (var i = 0; i < graphJSONconcrete.length; i++) {
     let graphEntityData = graphJSONconcrete[i]["data"];
     let graphEntityDataType = graphEntityData["type"];
@@ -156,7 +183,7 @@ function getEntityFrequency(
     }
 
     /**
-     * Check if all variants have been requested. 
+     * Check if all variants have been requested.
      * If not, delete the corresponding operators.
      */
     if (!areAllVariantsRepresented) {
@@ -167,51 +194,18 @@ function getEntityFrequency(
         continue;
       }
 
-      if (graphType === graphTypeEnum.EPC) {
-
-          /**
-           * If the query contains only one variant, 
-           * it is impossible for a single sequence to contain operators.
-           */
-        if (isOperatorIrrelevant) {
-          if (isOperatorEPC(graphEntityDataType)) {
-            deletedOperatorIds.push(graphEntityDataID);
-            graphJSONconcrete.splice(i, 1);
-            i--;
-            continue;
-          }
-
-          if (
-            graphEntityData.hasOwnProperty("source") &&
-            graphEntityData.hasOwnProperty("target")
-          ) {
-            let source = graphEntityData["source"];
-            let target = graphEntityData["target"];
-
-            if (deletedOperatorIds.includes(source)) {
-              markedIndexTarget.push({
-                i: i,
-              });
-            }
-
-            if (deletedOperatorIds.includes(target)) {
-              graphJSONconcrete.splice(i, 1);
-              i--;
-              markedIndexSource.push({
-                source: source,
-              });
-            }
-          }
-        
-          /**
-           * Several, but not all, variants are available in the request. 
-           * Individual check whether the respective operators are required.
-           */
-        }else{
-            
-        }
-      } else if (isOperatorIrrelevant && graphType === graphTypeEnum.BPMN) {
-        if (isOperatorBPMN(graphEntityDataType)) {
+      /**
+       * If the query contains only one variant,
+       * it is impossible for a single sequence to contain operators.
+       */
+      if (
+        (graphType === graphTypeEnum.EPC || graphType === graphTypeEnum.BPMN) &&
+        isOperatorIrrelevant
+      ) {
+        if (
+          isOperatorEPC(graphEntityDataType) ||
+          isOperatorBPMN(graphEntityDataType)
+        ) {
           deletedOperatorIds.push(graphEntityDataID);
           graphJSONconcrete.splice(i, 1);
           i--;
@@ -241,114 +235,155 @@ function getEntityFrequency(
         }
       }
 
-      if((graphType === graphTypeEnum.EPC || graphType === graphTypeEnum.BPMN) && !isOperatorIrrelevant){
-        if (isOperatorEPC(graphEntityDataType) || isOperatorBPMN(graphEntityDataType)){
+      if (
+        (graphType === graphTypeEnum.EPC || graphType === graphTypeEnum.BPMN) &&
+        !isOperatorIrrelevant
+      ) {
+        if (
+          isOperatorEPC(graphEntityDataType) ||
+          isOperatorBPMN(graphEntityDataType)
+        ) {
           markedOperatorsIndexMap[graphEntityDataID] = i;
-      } else if(isInformationFlowEPC(graphEntityDataType) || isStandardEdgeBBPMN(graphEntityDataType)){
+        } else if (
+          isInformationFlowEPC(graphEntityDataType) ||
+          isStandardEdgeBBPMN(graphEntityDataType)
+        ) {
           let edgeContainsOperator = false;
           let operatorID = "";
           let graphEntityDataSource = graphEntityData["source"];
           let graphEntityDataTarget = graphEntityData["target"];
-          if(Object.keys(markedOperatorsIndexMap).includes(graphEntityDataSource)){
-              edgeContainsOperator = true;
-              operatorID = graphEntityDataSource;
-          }else if(Object.keys(markedOperatorsIndexMap).includes(graphEntityDataTarget)){
-              edgeContainsOperator = true;
-              operatorID = graphEntityDataTarget;
+          if (
+            Object.keys(markedOperatorsIndexMap).includes(graphEntityDataSource)
+          ) {
+            edgeContainsOperator = true;
+            operatorID = graphEntityDataSource;
+          } else if (
+            Object.keys(markedOperatorsIndexMap).includes(graphEntityDataTarget)
+          ) {
+            edgeContainsOperator = true;
+            operatorID = graphEntityDataTarget;
           }
-          if(edgeContainsOperator){
-              let edgeElement = {"edgeID": graphEntityDataID, "edgeIndex": i, "source": graphEntityDataSource, "target": graphEntityDataTarget};
-              let operatorObject = {"operatorIndex": markedOperatorsIndexMap[operatorID],"operatorVariants": graphEntityData["variants"], "edgeArray":[edgeElement]};
-              if(Object.keys(markedOperatorsMap).includes(operatorID)){
-                  let operatorEdgeArray = markedOperatorsMap[operatorID]["edgeArray"];
-                  operatorEdgeArray.push(edgeElement);
-                  operatorObject["edgeArray"] = operatorEdgeArray;                       
-              } 
-              markedOperatorsMap[operatorID] = operatorObject;               
+          if (edgeContainsOperator) {
+            let edgeElement = {
+              edgeID: graphEntityDataID,
+              edgeIndex: i,
+              source: graphEntityDataSource,
+              target: graphEntityDataTarget,
+            };
+            let operatorObject = {
+              operatorIndex: markedOperatorsIndexMap[operatorID],
+              operatorVariants: graphEntityData["variants"],
+              edgeArray: [edgeElement],
+            };
+            if (Object.keys(markedOperatorsMap).includes(operatorID)) {
+              let operatorEdgeArray =
+                markedOperatorsMap[operatorID]["edgeArray"];
+              operatorEdgeArray.push(edgeElement);
+              operatorObject["edgeArray"] = operatorEdgeArray;
+            }
+            markedOperatorsMap[operatorID] = operatorObject;
           }
-
+        }
       }
-      }
-
-
     }
 
-      if (isSequenceEmpty) {
-        /** Analyse Entities and get frequency for every entity */
-        let sum = 0;
-        for (const [key, value] of Object.entries(frequencyMap)) {
-          if (
-            dataEntityVariants.includes(key) &&
-            (variantsReq.includes(key) || isReqEmpty)
-          ) {
-            sum += value;
-          }
+    if (isSequenceEmpty) {
+      /** Analyse Entities and get frequency for every entity */
+      let sum = 0;
+      for (const [key, value] of Object.entries(frequencyMap)) {
+        if (
+          dataEntityVariants.includes(key) &&
+          (variantsReq.includes(key) || isReqEmpty)
+        ) {
+          sum += value;
         }
-        if (!frequencyEdgeWidth.includes(sum)) {
-          /** Check if sum-Value already in "Set-Array" */
-          frequencyEdgeWidth.push(sum);
-        }
-        let newLine = "";
-        if (graphEntityData.hasOwnProperty("target")) {
-          /** Is the element an edge */
-          graphEntityData["sum"] = sum;
-        } else {
-          /** The element is a node  */
-          newLine = "\n";
-        }
-
-        if (sum > biggestSum && !isStartOrEndNode(graphEntityData["label"])) {
-          biggestSum = sum;
-        }
-        if (sum < smallestSum && !isStartOrEndNode(graphEntityData["label"])) {
-          smallestSum = sum;
-        }
-        graphEntityData[
-          "label"
-        ] = `${graphEntityData["label"]}${newLine}${sum}`;
+      }
+      if (!frequencyEdgeWidth.includes(sum)) {
+        /** Check if sum-Value already in "Set-Array" */
+        frequencyEdgeWidth.push(sum);
+      }
+      let newLine = "";
+      if (graphEntityData.hasOwnProperty("target")) {
+        /** Is the element an edge */
+        graphEntityData["sum"] = sum;
       } else {
-        labelSequenceID(graphEntityData, variantsReq, sequenceReq);
+        /** The element is a node  */
+        newLine = "\n";
       }
-      if (nodeEnv === "production") {
-        delete graphJSONconcrete[i]["data"]["variants"];
+
+      if (sum > biggestSum && !isStartOrEndNode(graphEntityData["label"])) {
+        biggestSum = sum;
       }
-    
+      if (sum < smallestSum && !isStartOrEndNode(graphEntityData["label"])) {
+        smallestSum = sum;
+      }
+      graphEntityData["label"] = `${graphEntityData["label"]}${newLine}${sum}`;
+    } else {
+      labelSequenceID(graphEntityData, variantsReq, sequenceReq);
+    }
+    if (nodeEnv === "production") {
+      delete graphJSONconcrete[i]["data"]["variants"];
+    }
   }
 
-  for(operator in markedOperatorsMap){
-      let edgeObject = markedOperatorsMap[operator];
-      let edgeArray = edgeObject["edgeArray"];
-      if(edgeArray.length == 2){
-          let source = "";
-          let target = "";
-          let newEgdeID = "";
-          let substractIndex = 0;
-          for (operatorEdgeIndex in edgeArray){           
-              let edgeElement = edgeArray[operatorEdgeIndex];
-            if(edgeElement["source"] == operator){
-                target = edgeElement["target"];
-            }else  if(edgeElement["target"] == operator){
-                source = edgeElement["source"];
-            }
-            graphJSONconcrete.splice(edgeElement["edgeIndex"] - substractIndex, 1);
-            substractIndex++;
-          }
-          let operatorProperties = graphJSONconcrete[edgeObject["operatorIndex"]];
-          let operatorSum = parseInt((operatorProperties["data"]["label"]).split("\n")[1]);
-          graphJSONconcrete.splice(edgeObject["operatorIndex"], 1);
-          newEgdeID = `${source}->${target}`;
-          let newEdge = {};
-          if(graphType == graphTypeEnum.EPC){
-            newEdge = {"data":{"id": newEgdeID, "source": source, "target": target, "type": "InformationFlow","sum": operatorSum, "label": operatorSum, "variants":edgeObject["operatorVariants"] }};
-          }else if(graphType == graphTypeEnum.BPMN){
-            newEdge = {"data":{"id": newEgdeID, "source": source, "target": target, "type": "StandardEdge","sum": operatorSum, "label": operatorSum, "variants":edgeObject["operatorVariants"] }};
-          }
-
-          
-          graphJSONconcrete.push(newEdge);
-
+  /**
+   * Check if the existing operators still need to be used or if they 
+   * can be deleted due to simple origin and destination edges.
+   */
+  for (operator in markedOperatorsMap) {
+    let edgeObject = markedOperatorsMap[operator];
+    let edgeArray = edgeObject["edgeArray"];
+    if (edgeArray.length == 2) {
+      let source = "";
+      let target = "";
+      let newEgdeID = "";
+      let substractIndex = 0;
+      for (operatorEdgeIndex in edgeArray) {
+        let edgeElement = edgeArray[operatorEdgeIndex];
+        if (edgeElement["source"] == operator) {
+          target = edgeElement["target"];
+        } else if (edgeElement["target"] == operator) {
+          source = edgeElement["source"];
+        }
+        graphJSONconcrete.splice(edgeElement["edgeIndex"] - substractIndex, 1);
+        substractIndex++;
       }
+      let operatorProperties = graphJSONconcrete[edgeObject["operatorIndex"]];
+      let operatorSum = parseInt(
+        operatorProperties["data"]["label"].split("\n")[1]
+      );
+      graphJSONconcrete.splice(edgeObject["operatorIndex"], 1);
+      newEgdeID = `${source}->${target}`;
+      let newEdge = {};
+      if (graphType == graphTypeEnum.EPC) {
+        newEdge = {
+          data: {
+            id: newEgdeID,
+            source: source,
+            target: target,
+            type: "InformationFlow",
+            sum: operatorSum,
+            label: operatorSum,
+            variants: edgeObject["operatorVariants"],
+          },
+        };
+      } else if (graphType == graphTypeEnum.BPMN) {
+        newEdge = {
+          data: {
+            id: newEgdeID,
+            source: source,
+            target: target,
+            type: "StandardEdge",
+            sum: operatorSum,
+            label: operatorSum,
+            variants: edgeObject["operatorVariants"],
+          },
+        };
+      }
+
+      graphJSONconcrete.push(newEdge);
     }
+  }
 
   for (let i = 0; i < markedIndexTarget.length; i++) {
     graphJSONconcrete[markedIndexTarget[i]["i"]]["data"]["source"] =
@@ -370,7 +405,7 @@ function getEntityFrequency(
  * @returns {boolean}
  */
 function isOperatorEPC(type) {
-  if (!type){
+  if (!type) {
     return false;
   }
   type = type.toLowerCase();
@@ -383,11 +418,11 @@ function isOperatorEPC(type) {
  * @param {string} type
  * @returns {boolean}
  */
-function isInformationFlowEPC(type){
-  if (!type){
+function isInformationFlowEPC(type) {
+  if (!type) {
     return false;
   }
-    return type.toLowerCase() == "informationflow";
+  return type.toLowerCase() == "informationflow";
 }
 
 /**
@@ -396,8 +431,8 @@ function isInformationFlowEPC(type){
  * @param {string} type
  * @returns {boolean}
  */
- function isStandardEdgeBBPMN(type){
-  if (!type){
+function isStandardEdgeBBPMN(type) {
+  if (!type) {
     return false;
   }
   return type.toLowerCase() == "standardedge";
@@ -412,7 +447,7 @@ function isInformationFlowEPC(type){
  * @returns {boolean}
  */
 function isOperatorBPMN(type) {
-  if (!type){
+  if (!type) {
     return false;
   }
   return type === "Parallel" || type === "Exclusive" || type === "Inclusive";

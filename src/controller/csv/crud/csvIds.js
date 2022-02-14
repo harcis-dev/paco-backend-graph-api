@@ -1,5 +1,5 @@
 /**
- * @file //TODO
+ * @file Controller to get all CSV-IDs
  * @author HARCIS-DEV TEAM
  */
 
@@ -9,7 +9,7 @@ const mongodb = require('../../../database/mongodb.js')
 const logger = require('../../../utils/log/log.js');
 
 /**
- * // TODO
+ *  Get all CSV-IDs with _id and name
  */
 function getCSVIds(request, response) {
     let database = mongodb.getDatabase();
