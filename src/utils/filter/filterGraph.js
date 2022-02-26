@@ -8,9 +8,9 @@ const nodeEnv = process.env.NODE_ENV || "development";
 const logger = require("../log/log.js");
 
 const graphTypeEnum = Object.freeze({
-  DFG: 1,
-  EPC: 2,
-  BPMN: 3,
+  dfg: 1,
+  epc: 2,
+  bpmn: 3,
 });
 
 /**
@@ -18,9 +18,10 @@ const graphTypeEnum = Object.freeze({
  * @param {Object} graphJSON - complete graph
  * @param {Array} variantsReq - Array of given variants to filter
  * @param {String} sequenceReq - on sequence to filter
+ * @param {Array} graphTypesRequest - Request for the required graphs
  * @returns {Object} graphJSON - processed graph
  */
-function filterGraph(graphJSON, variantsReq, sequenceReq) {
+function filterGraph(graphJSON, variantsReq, sequenceReq, graphTypesRequest) {
   logger.debug(`filter graph`);
   if (!Array.isArray(variantsReq)) {
     throw Error("variants must be an array");
@@ -28,31 +29,20 @@ function filterGraph(graphJSON, variantsReq, sequenceReq) {
   if (!(typeof sequenceReq === "string" || sequenceReq instanceof String)) {
     throw Error("sequence must be an string");
   }
-  if (graphJSON.hasOwnProperty("dfg")) {
-    filterConreteGraph(
-      graphJSON["dfg"]["graph"],
-      variantsReq,
-      sequenceReq,
-      graphTypeEnum.DFG
-    );
-  }
-  if (graphJSON.hasOwnProperty("epc")) {
-    filterConreteGraph(
-      graphJSON["epc"]["graph"],
-      variantsReq,
-      sequenceReq,
-      graphTypeEnum.EPC
-    );
-  }
-  if (graphJSON.hasOwnProperty("bpmn")) {
-    filterConreteGraph(
-      graphJSON["bpmn"]["graph"],
-      variantsReq,
-      sequenceReq,
-      graphTypeEnum.BPMN
-    );
-  }
 
+  for (let graphType in graphTypeEnum) {
+    if (!graphTypesRequest.includes(graphType)) {
+      delete graphJSON[graphType];
+    }else if (graphJSON.hasOwnProperty(graphType)) {
+        filterConreteGraph(
+          graphJSON[graphType]["graph"],
+          variantsReq,
+          sequenceReq,
+          graphType
+        );
+      
+    }
+  }
   return graphJSON;
 }
 
@@ -327,7 +317,7 @@ function getEntityFrequency(
   }
 
   /**
-   * Check if the existing operators still need to be used or if they 
+   * Check if the existing operators still need to be used or if they
    * can be deleted due to simple origin and destination edges.
    */
   for (operator in markedOperatorsMap) {
