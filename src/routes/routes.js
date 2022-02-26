@@ -50,10 +50,16 @@ const csvExport = require('../controller/csv/export/csvExport.js');
  */
 function setAppRouter(appRouter) {
 
+    const swaggerUi = require('swagger-ui-express');
+    const swaggerDocument = require('./swagger.json');
+
     appRouter.use(express.json());
     appRouter.use(express.urlencoded({
         extended: true
     }));
+
+    appRouter.use('/api-docs', swaggerUi.serve);
+    appRouter.get('/api-docs', swaggerUi.setup(swaggerDocument));
 
     //appRouter.use(upload.array()); 
     appRouter.use(express.static('public'));

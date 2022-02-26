@@ -1,0 +1,633 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Graph Server for SAP Data.",
+    "version": "0.0.1",
+    "title": "Graph API Server",
+    "contact": {
+      "url": "https://github.com/harcis-dev"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "host": "localhost:8080",
+  "tags": [
+    {
+      "name": "graph",
+      "description": ""
+    },
+    {
+      "name": "csv",
+      "description": ""
+    }
+  ],
+  "schemes": [
+    "https",
+    "http"
+  ],
+  "paths": {
+    "/graph": {
+      "post": {
+        "tags": [
+          "graph"
+        ],
+        "summary": "Add a new graph to the store",
+        "description": "",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Graph object that needs to be added to the store",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Graph"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Error: Requestbody must contain _id"
+          },
+          "500": {
+            "description": "Generated Error-String"
+          }
+        }
+      }
+    },
+    "/graph/{_id}": {
+      "post": {
+        "tags": [
+          "graph"
+        ],
+        "summary": "Get graph from database",
+        "description": "",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Select in the arrays by which parameters the graph should be filtered.",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/GetGraph"
+            }
+          },
+          {
+            "in": "path",
+            "type": "string",
+            "name": "_id",
+            "description": "Unique graph identification number",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK; Get filtered graph"
+          },
+          "400": {
+            "description": "Error: No graph in database with provided _id"
+          },
+          "500": {
+            "description": "Generated Error-String"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "graph"
+        ],
+        "summary": "Rename graph in database",
+        "description": "",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Choosen name.",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "Graph_321445"
+                }
+              }
+            }
+          },
+          {
+            "in": "path",
+            "type": "string",
+            "name": "_id",
+            "description": "Unique graph identification number",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Error: No graph in database with provided _id"
+          },
+          "500": {
+            "description": "Generated Error-String"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "graph"
+        ],
+        "summary": "Delete graph from database",
+        "description": "",
+        "consumes": [
+          "none"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "type": "string",
+            "name": "_id",
+            "description": "Unique graph identification number",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "acknowledged": {
+                  "type": "boolean",
+                  "example": "true"
+                },
+                "deletedCount": {
+                  "type": "integer",
+                  "example": 1
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error: No graph in database with provided _id"
+          },
+          "500": {
+            "description": "Generated Error-String"
+          }
+        }
+      }
+    },
+    "/graph/ids": {
+      "get": {
+        "tags": [
+          "graph"
+        ],
+        "summary": "Get all id, name and count of variants from every graph in database",
+        "description": "",
+        "consumes": [
+          "none"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "_id": {
+                    "type": "string",
+                    "example": "15"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "Graph_134801"
+                  },
+                  "variantsCount": {
+                    "type": "integer",
+                    "example": 3
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Generated Error-String"
+          }
+        }
+      }
+    },
+    "/graph/csv/{_id}": {
+      "delete": {
+        "tags": [
+          "csv"
+        ],
+        "summary": "Delete csv from database",
+        "description": "",
+        "parameters": [
+          {
+            "in": "path",
+            "type": "integer",
+            "name": "_id",
+            "description": "Unique graph identification number",
+            "required": true
+          }
+        ],
+        "consumes": [
+          "none"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "acknowledged": {
+                  "type": "boolean",
+                  "example": "true"
+                },
+                "deletedCount": {
+                  "type": "integer",
+                  "example": 1
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error: No graph in database with provided _id"
+          },
+          "500": {
+            "description": "Generated Error-String"
+          }
+        }
+      }
+    },
+    "/graph/csv/ids": {
+      "get": {
+        "tags": [
+          "csv"
+        ],
+        "summary": "Get id, name and path from every csv in database",
+        "description": "",
+        "consumes": [
+          "none"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "_id": {
+                    "type": "string",
+                    "example": "621a830db2076007bbb91dd7"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "CSV_134801"
+                  },
+                  "path": {
+                    "type": "string",
+                    "example": "upload\\cash_sequence_apro_1645904653912.csv"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Generated Error-String"
+          }
+        }
+      }
+    },
+    "/graph/csv/import": {
+      "post": {
+        "tags": [
+          "csv"
+        ],
+        "summary": "Import csv to database",
+        "description": "",
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "file",
+            "type": "file"
+          },
+          {
+            "in": "formData",
+            "name": "name",
+            "type": "string"
+          }
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Error: Requestbody must contain file"
+          },
+          "500": {
+            "description": "Generated Error-String"
+          }
+        }
+      }
+    },
+    "/graph/csv/download/{_id}": {
+      "get": {
+        "tags": [
+          "csv"
+        ],
+        "summary": "Download graph from database",
+        "description": "",
+        "consumes": [
+          "none"
+        ],
+        "produces": [
+          "text/csv"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "type": "string",
+            "name": "_id",
+            "description": "Unique graph identification number",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Error: Requestbody must contain _id"
+          },
+          "500": {
+            "description": "Generated Error-String"
+          }
+        }
+      }
+    },
+    "/graph/csv/preview/{_id}": {
+      "get": {
+        "tags": [
+          "csv"
+        ],
+        "summary": "Send a preview of 100 first rows as string",
+        "description": "",
+        "consumes": [
+          "none"
+        ],
+        "produces": [
+          "text/html"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "type": "string",
+            "name": "_id",
+            "description": "Unique graph identification number",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Error: Requestbody must contain _id"
+          },
+          "500": {
+            "description": "Generated Error-String"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Graph": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "integer",
+          "format": "int64",
+          "example": "13"
+        },
+        "dfg": {
+          "type": "object",
+          "properties": {
+            "graph": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/GraphDFG"
+              }
+            }
+          }
+        },
+        "epc": {
+          "type": "object",
+          "properties": {
+            "graph": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/GraphEPC"
+              }
+            }
+          }
+        },
+        "bpmn": {
+          "type": "object",
+          "properties": {
+            "graph": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/GraphBPMN"
+              }
+            }
+          }
+        }
+      }
+    },
+    "GraphDFG": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "example": "Start"
+            },
+            "label": {
+              "type": "string",
+              "example": "Start"
+            },
+            "type": {
+              "type": "string",
+              "example": "node"
+            },
+            "variants": {
+              "$ref": "#/definitions/Variants"
+            }
+          }
+        }
+      }
+    },
+    "GraphEPC": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "example": "Prozess gestartet"
+            },
+            "label": {
+              "type": "string",
+              "example": "Event"
+            },
+            "type": {
+              "type": "string",
+              "example": "node"
+            },
+            "variants": {
+              "$ref": "#/definitions/Variants"
+            }
+          }
+        }
+      }
+    },
+    "GraphBPMN": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "example": "Prozess"
+            },
+            "label": {
+              "type": "string",
+              "example": "Prozess"
+            },
+            "type": {
+              "type": "string",
+              "example": "Intermediate"
+            },
+            "variants": {
+              "$ref": "#/definitions/Variants"
+            }
+          }
+        }
+      }
+    },
+    "Variants": {
+      "type": "object",
+      "properties": {
+        "1": {
+          "type": "object",
+          "properties": {
+            "001_0": {
+              "type": "object",
+              "example": "01001337"
+            }
+          }
+        },
+        "2": {
+          "type": "object",
+          "properties": {
+            "001_1": {
+              "type": "object",
+              "example": "01001338"
+            },
+            "001_2": {
+              "type": "object",
+              "example": "01008765"
+            }
+          }
+        },
+        "3": {
+          "type": "object",
+          "properties": {
+            "001_3": {
+              "type": "object",
+              "example": "01008444"
+            }
+          }
+        }
+      }
+    },
+    "GetGraph": {
+      "type": "object",
+      "properties": {
+        "variants": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "example": [
+              1,
+              2
+            ]
+          }
+        },
+        "graphTypes": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "example": [
+              "EPC",
+              "BPMN"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
