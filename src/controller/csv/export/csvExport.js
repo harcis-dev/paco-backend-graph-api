@@ -8,6 +8,7 @@ const logger = require('../../../utils/log/log.js');
 // Database
 const mongodb = require('../../../database/mongodb.js')
 var fs = require('fs');
+const { ObjectId } = require("mongodb");
 
 
 /**
@@ -21,7 +22,7 @@ function csvExport(request, response) {
         return response.status(400).send("Error: Requestbody must contain _id");
     }
     let query = {
-        "_id": `${request["params"]["_id"]}`
+        "_id": ObjectId(`${request["params"]["_id"]}`)
     }
     let database = mongodb.getDatabase();
     database.collection(mongodb.mongodbCsvCollection).findOne(query, (error, result) => {
