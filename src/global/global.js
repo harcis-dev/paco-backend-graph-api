@@ -3,6 +3,10 @@
  * @author HARCIS-DEV TEAM
  */
 
+const environment = Object.freeze({
+  PRODUCTION: "production",
+});
+
 const graphTypeEnum = Object.freeze({
   DFG: "dfg",
   EPC: "epc",
@@ -32,24 +36,24 @@ const epcNodeEnum = Object.freeze({
   EXTERNAL_PERSON: "ExternalPerson",
   PRODUCT: "Product",
   OBJECTIVE: "Objective",
-  PERSON_TYPE: "PersonType"
+  PERSON_TYPE: "PersonType",
 });
 
 const epcOperatorEnum = Object.freeze({
   XOR: "XOR",
   OR: "OR",
-  AND: "AND"
+  AND: "AND",
 });
 
 const epcEdgeEnum = Object.freeze({
   INFORMATION_FLOW: "InformationFlow",
-  CONTROL_FLOW: "ControlFlow"
+  CONTROL_FLOW: "ControlFlow",
 });
 
 const epcEnum = Object.freeze({
   NODE: epcNodeEnum,
   OPERATOR: epcOperatorEnum,
-  EDGE: epcEdgeEnum
+  EDGE: epcEdgeEnum,
 });
 
 const bpmnNodeEnum = Object.freeze({
@@ -62,17 +66,36 @@ const bpmnNodeEnum = Object.freeze({
 const bpmnOperatorEnum = Object.freeze({
   EXCLUSIVE: "Exclusive",
   INCLUSIVE: "Inclusive",
-  PARALLEL: "Parallel"
+  PARALLEL: "Parallel",
 });
 
 const bpmnEdgeEnum = Object.freeze({
-  STANDARD_EDGE: "StandardEdge"
+  STANDARD_EDGE: "StandardEdge",
 });
 
 const bpmnEnum = Object.freeze({
   NODE: bpmnNodeEnum,
   OPERATOR: bpmnOperatorEnum,
-  EDGE: bpmnEdgeEnum
+  EDGE: bpmnEdgeEnum,
 });
 
-module.exports = graphTypeEnum, dfgEnum, epcEnum, bpmnEnum;
+const graphArtefacts = Object.freeze({
+  GRAPH: "graph",
+  DATA: "data",
+  ID: "id",
+  LABEL: "label",
+  TYPE: "type",
+  VARIANTS: "variants",
+  SOURCE: "source",
+  TARGET: "target",
+  LABEL: "label",
+});
+
+module.exports = {
+  environment,
+  graphTypeEnum,
+  dfgEnum,
+  epcEnum,
+  bpmnEnum,
+  graphArtefacts,
+};

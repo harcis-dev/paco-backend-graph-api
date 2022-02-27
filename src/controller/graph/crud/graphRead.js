@@ -10,6 +10,8 @@ const filterGraph = require("../../../utils/filter/filterGraph.js");
 
 const logger = require("../../../utils/log/log.js");
 
+const globalParameter = require("../../../global/global.js");
+
 /**
  * Request for an graph with the given ID in MongoDB
  * Filter with the parameter in body:
@@ -20,7 +22,7 @@ function getGraph(request, response) {
   let query = {
     _id: `${request["params"]["_id"]}`,
   };
-  let graphTypesRequest = ["dfg", "epc", "bpmn"];
+  let graphTypesRequest = Object.values(globalParameter.graphTypeEnum);
   if ("graphTypes" in request["body"]) {
     graphTypesRequest = request["body"]["graphTypes"];
   }

@@ -3,35 +3,44 @@
  * @author HARCIS-DEV TEAM
  */
 
-const graphTypeEnum = require("../../global/global.js");
+const globalParameter = require("../../global/global.js");
+const graphTypeEnum = globalParameter.graphTypeEnum;
+const graphArtefacts = globalParameter.graphArtefacts;
 
 /**
  * Selecting id, name, count of variants and types of graphs of a graph
- * @param {object} result - All objects from database
+ * @param {object} graphList - All objects from database
  * @returns {Array} graph meta data
  */
-function getIdsNamesAndVariantCounts(result) {
+function getIdsNamesAndVariantCounts(graphList) {
   let idVariantsCount = [];
-  for (let graphs of result) {
-    let id = graphs["_id"];
-    let name = graphs["name"];
-    let graph = 0;
+  for (let currentGraph of graphList) {
+    let id = currentGraph["_id"];
+    let name = currentGraph["name"];
+    let graphTemp = 0;
     let variantsCount = 0;
     let graphTypes = [];
 
     for (let graphType in graphTypeEnum) {
       graphType = graphTypeEnum[graphType];
-      if (graphs.hasOwnProperty(graphType)) {
-        if (!graph) {
-          graph = graphs[graphType];
+      if (currentGraph.hasOwnProperty(graphType)) {
+        if (!graphTemp) {
+          graphTemp = currentGraph[graphType];
         }
         graphTypes.push(graphType);
       }
     }
 
-    if (graph != 0) {
-      if (graph["graph"][0]["data"].hasOwnProperty("variants")) {
-        let variants = graph["graph"][0]["data"]["variants"];
+    if (graphTemp != 0) {
+      if (
+        graphTemp[graphArtefacts.GRAPH][0][graphArtefacts.DATA].hasOwnProperty(
+          graphArtefacts.VARIANTS
+        )
+      ) {
+        let variants =
+          graphTemp[graphArtefacts.GRAPH][0][graphArtefacts.DATA][
+            graphArtefacts.VARIANTS
+          ];
         variantsCount = Object.keys(variants).length;
       }
       idVariantsCount.push({
