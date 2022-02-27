@@ -32,6 +32,7 @@ mongodb.connectToServer( function( err, client ) {
     app.use('/graph', appRouter);
 
     logger.info(`Service started in ${nodeEnv}-Mode on Port ${serverPort}`);
+    logger.info(`API Docs: Available at http://localhost:${serverPort}/graph/api-docs`);
   } );
 
 
