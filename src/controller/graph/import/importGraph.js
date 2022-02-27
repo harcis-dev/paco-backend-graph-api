@@ -13,6 +13,7 @@ const jsonUtils = require("../../../utils/jsonUtils.js");
 const logger = require('../../../utils/log/log.js');
 const convertGraphmlToJson = require("../../../utils/convert/dfg/graphmlToJson.js");
 const convertEpmlToJson = require("../../../utils/convert/epc/epmlToJson.js");
+const { ObjectId } = require('mongodb');
 
 /**
  * Import any given graph to database
@@ -27,11 +28,6 @@ function importGraph(request, response) {
     if (!modell) {
         return response.status(400).send("Error: Requestbody must contain dfg, epc or bpmn");
     }
-    let _id = jsonUtils.getKeyFromJsonString(request["body"], "_id")
-    if (!request["body"].hasOwnProperty('name')) {
-        request["body"]['name'] = _id
-    }
-    let name = request["body"]['name'];
 
     let graphJson;
 
@@ -47,14 +43,12 @@ function importGraph(request, response) {
             break;
     }
     query = {
-        "_id": `${_id}`,
-        "name": name,
+        "_id": ObjectId().toString(),
+        "name": "new graph",
         [modell]: graphJson
     };
     let database = mongodb.getDatabase();
-    database.collection(mongodb.mongodbGraphCollection).replaceOne({
-        "_id": `${_id}`
-    }, query, {
+    database.collection(mongodb.mongodbGraphCollection).insertOne(query, {
         upsert: true
     }, (error, result) => {
         if (error) {
