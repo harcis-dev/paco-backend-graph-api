@@ -8,11 +8,15 @@ const mongodb = require('../../../database/mongodb.js')
 
 const logger = require('../../../utils/log/log.js');
 
+const graphTypeEnum = require("../../../global/global.js");
+
 /**
  * Get all availibe ids from all graphs in database,
  * contains:
+ * - _id
  * - graph name
  * - variantscount
+ * - graphTypes
  */
 function getGraphIds(request, response) {
     let database = mongodb.getDatabase();
@@ -28,9 +32,9 @@ function getGraphIds(request, response) {
 }
 
 /**
- * Selecting id, name and variantscount of a grapg
+ * Selecting id, name, count of variants and types of graphs of a graph
  * @param {object} result - All objects from database
- * @returns {object}
+ * @returns {Array} graph meta data
  */
 function getIdsNamesAndVariantCounts(result) {
     let idVariantsCount = [];
@@ -39,13 +43,16 @@ function getIdsNamesAndVariantCounts(result) {
         let name = graphs["name"];
         let graph = 0;
         let variantsCount = 0;
+        let graphTypes = [];
 
-        if (graphs.hasOwnProperty("dfg")) {
-            graph = graphs["dfg"];
-        } else if (graphs.hasOwnProperty("epc")) {
-            graph = graphs["epc"];
-        } else if (graphs.hasOwnProperty("bpmn")) {
-            graph = graphs["bpmn"];
+        for(let graphType in graphTypeEnum){
+            graphType = graphTypeEnum[graphType];
+            if (graphs.hasOwnProperty(graphType)) {
+                if(!graph){
+                    graph = graphs[graphType];
+                }            
+                graphTypes.push(graphType);
+            }
         }
 
         if (graph != 0) {
@@ -56,7 +63,8 @@ function getIdsNamesAndVariantCounts(result) {
             idVariantsCount.push({
                 "_id": id,
                 "name": name,
-                "variantsCount": variantsCount
+                "variantsCount": variantsCount,
+                "graphTypes": graphTypes
             });
         } else {
             idVariantsCount.push({

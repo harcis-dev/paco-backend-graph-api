@@ -6,12 +6,8 @@
 const jsonUtils = require("../jsonUtils.js");
 const nodeEnv = process.env.NODE_ENV || "development";
 const logger = require("../log/log.js");
+const graphTypeEnum = require("../../global/global.js");
 
-const graphTypeEnum = Object.freeze({
-  DFG: "dfg",
-  EPC: "epc",
-  BPMN: "bpmn",
-});
 
 /**
  * Filter all the given graph with requestparameters
