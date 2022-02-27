@@ -416,7 +416,7 @@
         "tags": [
           "csv"
         ],
-        "summary": "Send a preview of 100 first rows as string",
+        "summary": "Send a preview of n first rows as string",
         "description": "",
         "consumes": [
           "none"
@@ -425,6 +425,21 @@
           "text/html"
         ],
         "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Select column count",
+            "required": false,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "columnCount": {
+                  "type": "integer",
+                  "example": 50
+                }
+              }
+            }
+          },
           {
             "in": "path",
             "type": "string",
