@@ -58,19 +58,19 @@ function setAppRouter(appRouter) {
         extended: true
     }));
 
-    appRouter.use('/api-docs', swaggerUi.serve);
-    appRouter.get('/api-docs', swaggerUi.setup(swaggerDocument));
 
     //appRouter.use(upload.array()); 
     appRouter.use(express.static('public'));
+    
+    // # API Documentation
+    appRouter.use('/api-docs', swaggerUi.serve);
+    appRouter.get('/api-docs', swaggerUi.setup(swaggerDocument));
 
     // # graph
-
     // ## Import
     appRouter.post('/import', importGraph);
 
-
-    // ### CRUD
+    // ## CRUD
     appRouter.post('/', graphCreate);
     appRouter.post('/:_id', graphRead);
     appRouter.put('/:_id', graphRename);
@@ -88,6 +88,7 @@ function setAppRouter(appRouter) {
     appRouter.post('/csv/preview/:_id', csvPreview);
     // ## Import
     appRouter.post('/csv/import', upload.single('file'), csvImport);
+    // ## Export
     appRouter.get('/csv/download/:_id', csvExport);
 
     
