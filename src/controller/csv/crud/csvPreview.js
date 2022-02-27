@@ -16,10 +16,14 @@
  * @return
  */
  function csvPreview(request, response) {
-   
+    let rowCounter = 100;
     let query = {
         "_id": mongoose.Types.ObjectId(request["params"]["_id"])
     }
+    
+    if ("columnCount" in request["body"]) {
+        rowCounter = request["body"]["columnCount"];
+      }
     let database = mongodb.getDatabase();
     database.collection(mongodb.mongodbCsvCollection).findOne(query, (error, result) => {
         if (typeof result == 'undefined' || result == null || result["matchedCount"] == 0) {
@@ -39,8 +43,6 @@
             const lines = data.split('\n');
 
             const rowCount = lines.length;
-
-            var rowCounter = 100;
 
             if(rowCount < rowCounter){
                 rowCounter = rowCount;
