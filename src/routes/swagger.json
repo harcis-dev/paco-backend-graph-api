@@ -26,7 +26,6 @@
   "schemes": [
     "http",
     "https"
-
   ],
   "paths": {
     "/graph": {
@@ -209,7 +208,7 @@
         "tags": [
           "graph"
         ],
-        "summary": "Get all id, name and count of variants from every graph in database",
+        "summary": "Get all id, name, count of variants and availible graphtypes from every graph in database",
         "description": "",
         "consumes": [
           "none"
@@ -236,6 +235,16 @@
                   "variantsCount": {
                     "type": "integer",
                     "example": 3
+                  },
+                  "graphTypes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "example": [
+                        "dfg",
+                        "epc"
+                      ]
+                    }
                   }
                 }
               }
