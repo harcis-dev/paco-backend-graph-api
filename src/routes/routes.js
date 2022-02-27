@@ -85,7 +85,7 @@ function setAppRouter(appRouter) {
     // ## CRUD
     appRouter.get('/csv/ids', csvIds);
     appRouter.delete('/csv/:_id', csvDelete);
-    appRouter.get('/csv/preview/:_id', csvPreview);
+    appRouter.post('/csv/preview/:_id', csvPreview);
     // ## Import
     appRouter.post('/csv/import', upload.single('file'), csvImport);
     appRouter.get('/csv/download/:_id', csvExport);

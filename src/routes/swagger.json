@@ -412,7 +412,7 @@
       }
     },
     "/graph/csv/preview/{_id}": {
-      "get": {
+      "post": {
         "tags": [
           "csv"
         ],
