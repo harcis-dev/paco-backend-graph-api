@@ -14,3 +14,5 @@ services:
     image: mongo
     ports:
       - '27017:27017'
+    volumes:
+      - ~/paco-backend-graph-api/database/data/db:/data/db
