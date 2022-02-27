@@ -8,9 +8,9 @@ const nodeEnv = process.env.NODE_ENV || "development";
 const logger = require("../log/log.js");
 
 const graphTypeEnum = Object.freeze({
-  dfg: 1,
-  epc: 2,
-  bpmn: 3,
+  DFG: "dfg",
+  EPC: "epc",
+  BPMN: "bpmn",
 });
 
 /**
@@ -22,6 +22,9 @@ const graphTypeEnum = Object.freeze({
  * @returns {Object} graphJSON - processed graph
  */
 function filterGraph(graphJSON, variantsReq, sequenceReq, graphTypesRequest) {
+  graphTypesRequest = graphTypesRequest.map(function (e) {
+    return e.toLowerCase();
+  });
   logger.debug(`filter graph`);
   if (!Array.isArray(variantsReq)) {
     throw Error("variants must be an array");
@@ -31,16 +34,16 @@ function filterGraph(graphJSON, variantsReq, sequenceReq, graphTypesRequest) {
   }
 
   for (let graphType in graphTypeEnum) {
+    graphType = graphTypeEnum[graphType];
     if (!graphTypesRequest.includes(graphType)) {
       delete graphJSON[graphType];
-    }else if (graphJSON.hasOwnProperty(graphType)) {
-        filterConreteGraph(
-          graphJSON[graphType]["graph"],
-          variantsReq,
-          sequenceReq,
-          graphType
-        );
-      
+    } else if (graphJSON.hasOwnProperty(graphType)) {
+      filterConreteGraph(
+        graphJSON[graphType]["graph"],
+        variantsReq,
+        sequenceReq,
+        graphType
+      );
     }
   }
   return graphJSON;

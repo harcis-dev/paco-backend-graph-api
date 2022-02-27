@@ -22,7 +22,7 @@ function getGraph(request, response) {
   };
   let graphTypesRequest = ["dfg", "epc", "bpmn"];
   if ("graphTypes" in request["body"]) {
-    graphTypesRequest = request["body"]["graphTypes"].join(" ").toLowerCase();
+    graphTypesRequest = request["body"]["graphTypes"];
   }
   let database = mongodb.getDatabase();
   database
