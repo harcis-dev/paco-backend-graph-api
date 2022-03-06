@@ -17,7 +17,7 @@ app.use(
 
 // Run-Confgis
 const nodeEnv = process.env.NODE_ENV || 'development';
-const serverPort = process.env.SERVER_PORT || 8080;
+const serverPort = process.env.SERVER_PORT || 8088;
 const setAppRouter = require('./routes/routes.js')
 
 // Logging
