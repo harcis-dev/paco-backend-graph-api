@@ -359,8 +359,10 @@ function getEntityFrequency(
    * Check if the existing operators still need to be used or if they
    * can be deleted due to simple origin and destination edges.
    */
-  for (operator in markedOperatorsMap) {
-    let edgeObject = markedOperatorsMap[operator];
+  let array = Object.entries(markedOperatorsMap);
+  for (let i = 0; i < array.length; i++) {
+    let operator = array[i][0];
+    let edgeObject = array[i][1];
     let edgeArray = edgeObject["edgeArray"];
     if (edgeArray.length == 2) {
       let source = "";
