@@ -23,7 +23,7 @@ const environment = globalParameter.environment;
  * @returns {Object} graphJSON - processed graph
  */
 function filterGraph(graphJSON, variantsReq, sequenceReq, graphTypesRequest) {
-  if(typeof graphTypesRequest === 'undefined' || graphTypesRequest === null){
+  if (typeof graphTypesRequest === "undefined" || graphTypesRequest === null) {
     graphTypesRequest = Object.values(globalParameter.graphTypeEnum);
   }
   graphTypesRequest = graphTypesRequest.map(function (e) {
@@ -269,40 +269,52 @@ function getEntityFrequency(
           isInformationFlowEPC(graphEntityDataType) ||
           isStandardEdgeBPMN(graphEntityDataType)
         ) {
-          let edgeContainsOperator = false;
+          let opToOp = false;
           let operatorID = "";
           let graphEntityDataSource = graphEntityData[graphArtefacts.SOURCE];
           let graphEntityDataTarget = graphEntityData[graphArtefacts.TARGET];
+
+          let operatorIDs = [];
           if (
+            Object.keys(markedOperatorsIndexMap).includes(
+              graphEntityDataSource
+            ) &&
+            Object.keys(markedOperatorsIndexMap).includes(graphEntityDataTarget)
+          ) {
+            operatorIDs.push(graphEntityDataSource);
+            operatorIDs.push(graphEntityDataTarget);
+            opToOp = true;
+          } else if (
             Object.keys(markedOperatorsIndexMap).includes(graphEntityDataSource)
           ) {
-            edgeContainsOperator = true;
-            operatorID = graphEntityDataSource;
+            operatorIDs.push(graphEntityDataSource);
           } else if (
             Object.keys(markedOperatorsIndexMap).includes(graphEntityDataTarget)
           ) {
-            edgeContainsOperator = true;
-            operatorID = graphEntityDataTarget;
+            operatorIDs.push(graphEntityDataTarget);
           }
-          if (edgeContainsOperator) {
-            let edgeElement = {
-              edgeID: graphEntityDataID,
-              edgeIndex: i,
-              source: graphEntityDataSource,
-              target: graphEntityDataTarget,
-            };
-            let operatorObject = {
-              operatorIndex: markedOperatorsIndexMap[operatorID],
-              operatorVariants: graphEntityData[graphArtefacts.VARIANTS],
-              edgeArray: [edgeElement],
-            };
-            if (Object.keys(markedOperatorsMap).includes(operatorID)) {
-              let operatorEdgeArray =
-                markedOperatorsMap[operatorID]["edgeArray"];
-              operatorEdgeArray.push(edgeElement);
-              operatorObject["edgeArray"] = operatorEdgeArray;
+          if (operatorIDs) {
+            for (operatorID of operatorIDs) {
+              let edgeElement = {
+                edgeID: graphEntityDataID,
+                edgeIndex: i,
+                source: graphEntityDataSource,
+                target: graphEntityDataTarget,
+                opToOp: opToOp,
+              };
+              let operatorObject = {
+                operatorIndex: markedOperatorsIndexMap[operatorID],
+                operatorVariants: graphEntityData[graphArtefacts.VARIANTS],
+                edgeArray: [edgeElement],
+              };
+              if (Object.keys(markedOperatorsMap).includes(operatorID)) {
+                let operatorEdgeArray =
+                  markedOperatorsMap[operatorID]["edgeArray"];
+                operatorEdgeArray.push(edgeElement);
+                operatorObject["edgeArray"] = operatorEdgeArray;
+              }
+              markedOperatorsMap[operatorID] = operatorObject;
             }
-            markedOperatorsMap[operatorID] = operatorObject;
           }
         }
       }
@@ -360,32 +372,44 @@ function getEntityFrequency(
    * can be deleted due to simple origin and destination edges.
    */
   let array = Object.entries(markedOperatorsMap);
-  for (let i = 0; i < array.length; i++) {
-    let operator = array[i][0];
-    let edgeObject = array[i][1];
+  let substractIndex = 0;
+
+  let counter3;
+  for (counter3 = 0; counter3 < array.length; counter3++) {
+    let operator = array[counter3][0];
+    let edgeObject = array[counter3][1];
     let edgeArray = edgeObject["edgeArray"];
+
     if (edgeArray.length == 2) {
       let source = "";
       let target = "";
       let newEgdeID = "";
-      let substractIndex = 0;
+      let edgeElement;
       for (operatorEdgeIndex in edgeArray) {
-        let edgeElement = edgeArray[operatorEdgeIndex];
+        edgeElement = edgeArray[operatorEdgeIndex];
         if (edgeElement[graphArtefacts.SOURCE] == operator) {
           target = edgeElement[graphArtefacts.TARGET];
         } else if (edgeElement[graphArtefacts.TARGET] == operator) {
           source = edgeElement[graphArtefacts.SOURCE];
         }
-        graphJSONconcrete.splice(edgeElement["edgeIndex"] - substractIndex, 1);
+        // Delete unused edges
+        let febuob = graphJSONconcrete.findIndex(
+          (y) => y.data.id === edgeElement["edgeID"]
+        );
+        graphJSONconcrete.splice(febuob, 1);
         substractIndex++;
       }
+
       let operatorProperties = graphJSONconcrete[edgeObject["operatorIndex"]];
       let operatorSum = parseInt(
         operatorProperties[graphArtefacts.DATA][graphArtefacts.LABEL].split(
           "\n"
         )[1]
       );
-      graphJSONconcrete.splice(edgeObject["operatorIndex"], 1);
+      // delete unused operator
+      let febuob = graphJSONconcrete.findIndex((y) => y.data.id === operator);
+      graphJSONconcrete.splice(febuob, 1);
+      substractIndex++;
       newEgdeID = `${source}->${target}`;
       let newEdge = {};
       if (graphType == graphTypeEnum.EPC) {
@@ -415,6 +439,41 @@ function getEntityFrequency(
       }
 
       graphJSONconcrete.push(newEdge);
+      array.splice(counter3, 1);
+      if (edgeElement["opToOp"]) {
+        for (let ii = 0; ii < array.length; ii++) {
+          let edgeArrayB = array[ii][1]['edgeArray']
+          for(let jj = 0; jj < array.length; jj++){
+            if(edgeArrayB[jj]['source'] === operator){
+              array[ii][1]['edgeArray'][jj]['source'] = source;
+              array[ii][1]['edgeArray'][jj]['edgeID'] = newEgdeID;
+
+            }
+          }
+        }
+      }
+
+      
+      for (let j = 0; j < array.length; j++) {
+        // let operatorJ = array[j][0];
+        let edgeObjectJ = array[j][1];
+        let edgeArrayJ = edgeObjectJ["edgeArray"];
+        for (let k = 0; k < edgeArrayJ.length; k++) {
+          if (
+            edgeArrayJ[k]["target"] == operator ||
+            edgeArrayJ[k]["source"] == operator
+          ) {
+            let operatorID = edgeArrayJ[k]["edgeID"];
+            edgeArrayJ.splice(k, 1);
+            array[j][1]["edgeArray"] = edgeArrayJ;
+            let febuob = graphJSONconcrete.findIndex(
+              (y) => y.data.id === operatorID
+            );
+            graphJSONconcrete.splice(febuob, 1);
+          }
+        }
+      }
+      counter3 = -1;
     }
   }
 
