@@ -14,7 +14,6 @@ const bpmnEnum = globalParameter.bpmnEnum;
 const graphArtefacts = globalParameter.graphArtefacts;
 const environment = globalParameter.environment;
 
-
 /**
  * Filter all the given graph with requestparameters
  * @param {Object} graphJSON - complete graph
@@ -64,7 +63,11 @@ function filterConreteGraph(
   sequenceReq,
   graphType
 ) {
-  if (!graphJSONconcrete[0][graphArtefacts.DATA].hasOwnProperty(graphArtefacts.VARIANTS)) {
+  if (
+    !graphJSONconcrete[0][graphArtefacts.DATA].hasOwnProperty(
+      graphArtefacts.VARIANTS
+    )
+  ) {
     /** No variants and sequences availible to filter */
     return;
   }
@@ -72,7 +75,8 @@ function filterConreteGraph(
   /** Check if Request is empty -> do not filter  */
   let isReqEmpty = jsonUtils.isEmptyObject(variantsReq) && isSequenceEmpty;
   let frequencyMap = {};
-  let variantsGraphMap = graphJSONconcrete[0][graphArtefacts.DATA][graphArtefacts.VARIANTS];
+  let variantsGraphMap =
+    graphJSONconcrete[0][graphArtefacts.DATA][graphArtefacts.VARIANTS];
 
   /** if Sequence is availible add Node-ID to Label, otherwise get frequency */
   if (isSequenceEmpty) {
@@ -158,7 +162,8 @@ function getEntityFrequency(
    */
   let areAllVariantsRepresented =
     variantsReq.length == 0 ||
-    variantsReq.length == graphJSONconcrete[0][graphArtefacts.DATA][graphArtefacts.VARIANTS].length;
+    variantsReq.length ==
+      graphJSONconcrete[0][graphArtefacts.DATA][graphArtefacts.VARIANTS].length;
   /**
    * Contains ID of the operator, as well as the index in the graph
    */
@@ -172,7 +177,9 @@ function getEntityFrequency(
     let graphEntityData = graphJSONconcrete[i][graphArtefacts.DATA];
     let graphEntityDataType = graphEntityData[graphArtefacts.TYPE];
     let graphEntityDataID = graphEntityData[graphArtefacts.ID];
-    let dataEntityVariants = Object.keys(graphEntityData[graphArtefacts.VARIANTS]);
+    let dataEntityVariants = Object.keys(
+      graphEntityData[graphArtefacts.VARIANTS]
+    );
     if (!graphEntityData.hasOwnProperty(graphArtefacts.LABEL)) {
       graphEntityData[graphArtefacts.LABEL] = "";
     }
@@ -214,17 +221,30 @@ function getEntityFrequency(
           let source = graphEntityData[graphArtefacts.SOURCE];
           let target = graphEntityData[graphArtefacts.TARGET];
 
-          if (deletedOperatorIds.includes(source)) {
+          if (
+            deletedOperatorIds.includes(source) &&
+            deletedOperatorIds.includes(target)
+          ) {
             markedIndexTarget.push({
               i: i,
+              source: source,
+              target: target,
+              opToOp: true,
             });
-          }
-
-          if (deletedOperatorIds.includes(target)) {
+          } else if (deletedOperatorIds.includes(source)) {
+            markedIndexTarget.push({
+              i: i,
+              source: source,
+              target: target,
+              opToOp: false,
+            });
+          } else if (deletedOperatorIds.includes(target)) {
             graphJSONconcrete.splice(i, 1);
             i--;
             markedIndexSource.push({
               source: source,
+              target: target,
+              opToOp: false,
             });
           }
         }
@@ -306,13 +326,21 @@ function getEntityFrequency(
         newLine = "\n";
       }
 
-      if (sum > biggestSum && !isStartOrEndNode(graphEntityData[graphArtefacts.LABEL])) {
+      if (
+        sum > biggestSum &&
+        !isStartOrEndNode(graphEntityData[graphArtefacts.LABEL])
+      ) {
         biggestSum = sum;
       }
-      if (sum < smallestSum && !isStartOrEndNode(graphEntityData[graphArtefacts.LABEL])) {
+      if (
+        sum < smallestSum &&
+        !isStartOrEndNode(graphEntityData[graphArtefacts.LABEL])
+      ) {
         smallestSum = sum;
       }
-      graphEntityData[graphArtefacts.LABEL] = `${graphEntityData[graphArtefacts.LABEL]}${newLine}${sum}`;
+      graphEntityData[graphArtefacts.LABEL] = `${
+        graphEntityData[graphArtefacts.LABEL]
+      }${newLine}${sum}`;
     } else {
       labelSequenceID(graphEntityData, variantsReq, sequenceReq);
     }
@@ -345,7 +373,9 @@ function getEntityFrequency(
       }
       let operatorProperties = graphJSONconcrete[edgeObject["operatorIndex"]];
       let operatorSum = parseInt(
-        operatorProperties[graphArtefacts.DATA][graphArtefacts.LABEL].split("\n")[1]
+        operatorProperties[graphArtefacts.DATA][graphArtefacts.LABEL].split(
+          "\n"
+        )[1]
       );
       graphJSONconcrete.splice(edgeObject["operatorIndex"], 1);
       newEgdeID = `${source}->${target}`;
@@ -380,10 +410,48 @@ function getEntityFrequency(
     }
   }
 
-  for (let i = 0; i < markedIndexTarget.length; i++) {
-    graphJSONconcrete[markedIndexTarget[i]["i"]][graphArtefacts.DATA][graphArtefacts.SOURCE] =
-      markedIndexSource[i][graphArtefacts.SOURCE];
+  /**
+   * Listing of the unneeded edges in the graph
+   */
+  let opToOpEdge = [];
+
+  /**
+   * Overwrite the origin nodes in the edges, depending on the deleted operators.
+   */
+  for (let i = 0; i < markedIndexSource.length; i++) {
+    let target = markedIndexSource[i][graphArtefacts.TARGET];
+    for (let j = 0; j < markedIndexTarget.length; j++) {
+      let source = markedIndexTarget[j][graphArtefacts.SOURCE];
+      if (source == target) {
+        let index = markedIndexTarget[j]["i"];
+        if (markedIndexTarget[j]["opToOp"]) {
+          opToOpEdge.push(index);
+          let sourceTemp = markedIndexTarget[j][graphArtefacts.TARGET];
+          for (let k = 0; k < markedIndexTarget.length; k++) {
+            let targetTemp = markedIndexTarget[k][graphArtefacts.SOURCE];
+            if (sourceTemp == targetTemp) {
+              target = sourceTemp;
+              break;
+            }
+          }
+
+          continue;
+        }
+
+        graphJSONconcrete[index][graphArtefacts.DATA][graphArtefacts.SOURCE] =
+          markedIndexSource[i][graphArtefacts.SOURCE];
+        break;
+      }
+    }
   }
+
+  /**
+   * Deleting the unnecessary edges in the graph
+   */
+  for (edge of opToOpEdge) {
+    graphJSONconcrete.splice(edge, 1);
+  }
+
   return {
     biggestSum: biggestSum,
     smallestSum: smallestSum,
@@ -403,9 +471,11 @@ function isOperatorEPC(type) {
   if (!type) {
     return false;
   }
-  return Object.values(epcEnum.OPERATOR).map(function (e) {
-    return e.toLowerCase();
-  }).includes(type.toLowerCase());
+  return Object.values(epcEnum.OPERATOR)
+    .map(function (e) {
+      return e.toLowerCase();
+    })
+    .includes(type.toLowerCase());
 }
 
 /**
@@ -445,10 +515,12 @@ function isStandardEdgeBPMN(type) {
 function isOperatorBPMN(type) {
   if (!type) {
     return false;
-  }  
-  return Object.values(bpmnEnum.OPERATOR).map(function (e) {
-    return e.toLowerCase();
-  }).includes(type.toLowerCase());
+  }
+  return Object.values(bpmnEnum.OPERATOR)
+    .map(function (e) {
+      return e.toLowerCase();
+    })
+    .includes(type.toLowerCase());
 }
 
 /**
@@ -568,9 +640,9 @@ function getVariantFromSequence(sequenceReq, variant) {
 function labelSequenceID(graphData, variant, sequenceReq) {
   graphDataLabel = graphData[graphArtefacts.LABEL];
   if (graphDataLabel != "" && !isStartOrEndNode(graphDataLabel)) {
-    graphData[
-      graphArtefacts.LABEL
-    ] = `${graphDataLabel}\n${graphData[graphArtefacts.LABEL][variant][sequenceReq]}`;
+    graphData[graphArtefacts.LABEL] = `${graphDataLabel}\n${
+      graphData[graphArtefacts.LABEL][variant][sequenceReq]
+    }`;
   }
 }
 
