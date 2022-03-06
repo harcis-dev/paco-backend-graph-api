@@ -22,7 +22,7 @@ function getGraph(request, response) {
   let query = {
     _id: `${request["params"]["_id"]}`,
   };
-  let graphTypesRequest = Object.values(globalParameter.graphTypeEnum);
+  let graphTypesRequest;
   if ("graphTypes" in request["body"]) {
     graphTypesRequest = request["body"]["graphTypes"];
   }

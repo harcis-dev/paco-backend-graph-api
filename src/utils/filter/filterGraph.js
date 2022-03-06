@@ -23,6 +23,9 @@ const environment = globalParameter.environment;
  * @returns {Object} graphJSON - processed graph
  */
 function filterGraph(graphJSON, variantsReq, sequenceReq, graphTypesRequest) {
+  if(typeof graphTypesRequest === 'undefined' || graphTypesRequest === null){
+    graphTypesRequest = Object.values(globalParameter.graphTypeEnum);
+  }
   graphTypesRequest = graphTypesRequest.map(function (e) {
     return e.toLowerCase();
   });
@@ -250,6 +253,9 @@ function getEntityFrequency(
         }
       }
 
+      /**
+       * Delete the not needed operators, if not all variants are addressed
+       */
       if (
         (graphType === graphTypeEnum.EPC || graphType === graphTypeEnum.BPMN) &&
         !isOperatorIrrelevant
