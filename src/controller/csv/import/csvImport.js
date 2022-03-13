@@ -5,10 +5,13 @@
 
 const jsonUtils = require("../../../utils/jsonUtils.js");
 const logger = require('../../../utils/log/log.js');
+const axios = require("axios");
+const FormData = require("form-data");
+const fs = require('fs');
 
 // Database
 const mongodb = require('../../../database/mongodb.js')
-const fs = require('fs');
+
 
 /**
  * // TODO
@@ -87,10 +90,30 @@ function csvImport(request, response) {
             return response.status(500).send(error);
         }
         logger.debug(`replaceOne: ${result}`);
+        sendCSVtoGraphApi(file_path);
         response.send(result);
     });
 }
 
+function sendCSVtoGraphApi(path){
+    const url = process.env.GRAPH_URL || "http://localhost:5000/graphs";
+    const form_data = new FormData();
+    form_data.append("file", fs.createReadStream(path));
+    
+    const request_config = {
+      headers: {
+        ...form_data.getHeaders()
+      },
+      maxContentLength: Infinity,
+      maxBodyLength: Infinity,
+        /* auth: { // if auth is needed
+        username: USERNAME,
+        password: PASSWORD
+      } */
+    }
+    
+    return axios.post(url, form_data, request_config)
+}
 
 
 module.exports = csvImport;
