@@ -20,14 +20,15 @@ const environment = globalParameter.environment;
  * @param {Array} variantsReq - Array of given variants to filter
  * @param {String} sequenceReq - on sequence to filter
  * @param {Array} graphTypesRequest - Request for the required graphs
+ * @param {Number} nodes - Filter graph by the number of nodes
  * @returns {Object} graphJSON - processed graph
  */
-function filterGraph(graphJSON, variantsReq, sequenceReq, graphTypesRequest) {
+function filterGraph(graphJSON, variantsReq, sequenceReq, graphTypesRequest, nodes) {
   if (typeof graphTypesRequest === "undefined" || graphTypesRequest === null) {
     graphTypesRequest = Object.values(globalParameter.graphTypeEnum);
   }
-  graphTypesRequest = graphTypesRequest.map(function (e) {
-    return e.toLowerCase();
+  graphTypesRequest = graphTypesRequest.map(function (arrayStringToLower) {
+    return arrayStringToLower.toLowerCase();
   });
   logger.debug(`filter graph`);
   if (!Array.isArray(variantsReq)) {
@@ -36,12 +37,19 @@ function filterGraph(graphJSON, variantsReq, sequenceReq, graphTypesRequest) {
   if (!(typeof sequenceReq === "string" || sequenceReq instanceof String)) {
     throw Error("sequence must be an string");
   }
+  if (!(typeof nodes === "number" || nodes instanceof Number)) {
+    throw Error("nodes must be an number");
+  }
 
   for (let graphType in graphTypeEnum) {
     graphType = graphTypeEnum[graphType];
     if (!graphTypesRequest.includes(graphType)) {
       delete graphJSON[graphType];
     } else if (graphJSON.hasOwnProperty(graphType)) {
+      if(nodes > 0){
+        variantsReq = getVariantsFromNodes(graphJSON, graphType, nodes);
+      }
+    
       filterConreteGraph(
         graphJSON[graphType][graphArtefacts.GRAPH],
         variantsReq,
@@ -513,7 +521,7 @@ function getEntityFrequency(
   }
 
   /**
-   * Deleting the unnecessary edges in the graph
+   * Deleting unnecessary edges in the graph
    */
   for (edge of opToOpEdge) {
     graphJSONconcrete.splice(edge, 1);
@@ -711,6 +719,30 @@ function labelSequenceID(graphData, variant, sequenceReq) {
       graphData[graphArtefacts.LABEL][variant][sequenceReq]
     }`;
   }
+}
+
+function getVariantsFromNodes(graphJSON, graphType, nodes){
+  let nodesToDelete = 1 - nodes;
+  let frequencyMap = {};
+  let deleteCount = 0;
+  let values = [];
+  let variants =
+  graphJSON[graphType][graphArtefacts.GRAPH][0][graphArtefacts.DATA][
+        graphArtefacts.VARIANTS
+      ];
+  variantsCount = Object.keys(variants).length;
+  frequencyMap = getFrequencyMap(variants);
+  frequencyMap = jsonUtils.sortMapByValue(frequencyMap);
+  
+  if(nodesToDelete <= 0){
+    nodesToDelete = 0,01
+  }else if(nodesToDelete > 1){
+    nodesToDelete = 1
+  }
+  deleteCount = Math.ceil(nodesToDelete * variantsCount) - 1;
+  variants = Object.keys(frequencyMap);
+  variants.splice((variantsCount - deleteCount), deleteCount);
+  return variants;
 }
 
 module.exports = filterGraph;

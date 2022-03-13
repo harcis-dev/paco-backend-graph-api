@@ -23,8 +23,12 @@ function getGraph(request, response) {
     _id: `${request["params"]["_id"]}`,
   };
   let graphTypesRequest;
+  let nodes = 0;
   if ("graphTypes" in request["body"]) {
     graphTypesRequest = request["body"]["graphTypes"];
+  }
+  if ("nodes" in request["body"]) {
+    nodes = request["body"]["nodes"];
   }
   let database = mongodb.getDatabase();
   database
@@ -52,7 +56,7 @@ function getGraph(request, response) {
       logger.debug(`findOne: ${result}`);
       try {
         response.send(
-          filterGraph(result, variants, sequence, graphTypesRequest)
+          filterGraph(result, variants, sequence, graphTypesRequest, nodes)
         );
       } catch (error) {
         logger.error(`${error}`);

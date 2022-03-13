@@ -24,7 +24,26 @@ function getKeyFromJsonString(stringValue, key) {
     return objectValue[key];
 }
 
+/**
+ * Sort a map by value
+ * @param {Map} map map to sort
+ * @returns {Map} sorted map
+ */
+function sortMapByValue(map) {
+    var tupleArray = [];
+    for (var key in map) tupleArray.push([key, map[key]]);
+    tupleArray.sort(function (a, b) {
+        return b[1] - a[1]
+    });
+    var sortedMap = {};
+    tupleArray.forEach(function (el) {
+        sortedMap[el[0]] = el[1]
+    });
+    return sortedMap;
+}
+
 module.exports = {
     isEmptyObject: isEmptyObject,
-    getKeyFromJsonString: getKeyFromJsonString
+    getKeyFromJsonString: getKeyFromJsonString,
+    sortMapByValue: sortMapByValue
 };

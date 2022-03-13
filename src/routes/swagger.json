@@ -633,6 +633,7 @@
       "type": "object",
       "properties": {
         "variants": {
+          "description": "Variant filtering selection - Lowest Priority",
           "type": "array",
           "items": {
             "type": "integer",
@@ -642,7 +643,15 @@
             ]
           }
         },
+        "sequence": {
+          "description": "Filter by a single sequence - Highest Priority",
+          "type": "string",
+          "example": [
+            "001_0"
+          ]
+        },
         "graphTypes": {
+          "description": "Filter by a requested graphTypes",
           "type": "array",
           "items": {
             "type": "integer",
@@ -651,6 +660,11 @@
               "BPMN"
             ]
           }
+        },
+        "nodes": {
+          "description": "Percentage of how many nodes should be kept in the graph. Nodes should be > 0 and <= 1 - Medium Priority",
+          "type": "number",
+          "example": 1
         }
       }
     }
