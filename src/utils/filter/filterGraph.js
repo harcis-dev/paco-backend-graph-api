@@ -37,17 +37,18 @@ function filterGraph(graphJSON, variantsReq, sequenceReq, graphTypesRequest, nod
   if (!(typeof sequenceReq === "string" || sequenceReq instanceof String)) {
     throw Error("sequence must be an string");
   }
-  if (!(typeof nodes === "number" || nodes instanceof Number)) {
-    throw Error("nodes must be an number");
-  }
 
   for (let graphType in graphTypeEnum) {
     graphType = graphTypeEnum[graphType];
     if (!graphTypesRequest.includes(graphType)) {
       delete graphJSON[graphType];
     } else if (graphJSON.hasOwnProperty(graphType)) {
-      if(nodes >= 0){
-        variantsReq = getVariantsFromNodes(graphJSON, graphType, nodes);
+      if((typeof nodes === "number" || nodes instanceof Number) && nodes >= 0){
+        let variants =
+        graphJSON[graphType][graphArtefacts.GRAPH][0][graphArtefacts.DATA][
+              graphArtefacts.VARIANTS
+            ];
+        variantsReq = getVariantsFromNodes(variants, nodes);
       }
     
       filterConreteGraph(
@@ -721,28 +722,39 @@ function labelSequenceID(graphData, variant, sequenceReq) {
   }
 }
 
-function getVariantsFromNodes(graphJSON, graphType, nodes){
+function getVariantsFromNodes(variants, nodes){
   let nodesToDelete = 1 - nodes;
   let frequencyMap = {};
   let deleteCount = 0;
-  let values = [];
-  let variants =
-  graphJSON[graphType][graphArtefacts.GRAPH][0][graphArtefacts.DATA][
-        graphArtefacts.VARIANTS
-      ];
   variantsCount = Object.keys(variants).length;
   frequencyMap = getFrequencyMap(variants);
-  frequencyMap = jsonUtils.sortMapByValue(frequencyMap);
-  
+
   if(nodesToDelete <= 0){
     nodesToDelete = 0.01
   }else if(nodesToDelete > 1){
     nodesToDelete = 1
   }
+
   deleteCount = Math.ceil(nodesToDelete * variantsCount) - 1;
-  variants = Object.keys(frequencyMap);
-  variants.splice((variantsCount - deleteCount), deleteCount);
-  return variants;
+
+  let variantsFilteredByNodes = sortFrequencyMapByDeleteCount(frequencyMap, deleteCount);
+
+  return variantsFilteredByNodes;
+}
+
+/**
+ * Sort a map by value
+ * @param {Map} map map to sort
+ * @returns {Map} sorted map
+ */
+ function sortFrequencyMapByDeleteCount(frequencyMap, deleteCount) { 
+  let tupleArray;
+  let sortedMap; 
+
+  tupleArray = jsonUtils.generateTupleArrayFromMap(frequencyMap);
+  tupleArray.splice((variantsCount - deleteCount), deleteCount);
+  sortedMap = jsonUtils.generateMapFromTupleArray(tupleArray);
+  return Object.keys(sortedMap);
 }
 
 module.exports = filterGraph;
