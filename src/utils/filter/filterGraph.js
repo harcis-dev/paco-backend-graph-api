@@ -716,7 +716,7 @@ function labelSequenceID(graphData, variant, sequenceReq) {
   graphDataLabel = graphData[graphArtefacts.LABEL];
   if (graphDataLabel != "" && !isStartOrEndNode(graphDataLabel)) {
     graphData[graphArtefacts.LABEL] = `${graphDataLabel}\n${
-      graphData[graphArtefacts.LABEL][variant][sequenceReq]
+      graphData[graphArtefacts.VARIANTS][variant][sequenceReq]
     }`;
   }
 }
