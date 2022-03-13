@@ -23,7 +23,7 @@ function getGraph(request, response) {
     _id: `${request["params"]["_id"]}`,
   };
   let graphTypesRequest;
-  let nodes = 0;
+  let nodes = -1;
   if ("graphTypes" in request["body"]) {
     graphTypesRequest = request["body"]["graphTypes"];
   }

@@ -46,7 +46,7 @@ function filterGraph(graphJSON, variantsReq, sequenceReq, graphTypesRequest, nod
     if (!graphTypesRequest.includes(graphType)) {
       delete graphJSON[graphType];
     } else if (graphJSON.hasOwnProperty(graphType)) {
-      if(nodes > 0){
+      if(nodes >= 0){
         variantsReq = getVariantsFromNodes(graphJSON, graphType, nodes);
       }
     
@@ -735,7 +735,7 @@ function getVariantsFromNodes(graphJSON, graphType, nodes){
   frequencyMap = jsonUtils.sortMapByValue(frequencyMap);
   
   if(nodesToDelete <= 0){
-    nodesToDelete = 0,01
+    nodesToDelete = 0.01
   }else if(nodesToDelete > 1){
     nodesToDelete = 1
   }
