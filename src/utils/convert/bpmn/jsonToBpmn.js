@@ -15,9 +15,9 @@ const logger = require('../../log/log.js');
  function convertBpmnJson2Bpmn(_id, name, bpmn) {
     logger.debug(`convert BPMN JSON to BPMN`);
     let xmlString = xmlHead;
-    let processRef = "Process_" + bpmn['_id'];
+    let processRef = bpmn['_id'];
     let graphArray = bpmn['bpmn']['graph'];
-    let processString = ` <bpmn:process id="${processRef}" isExecutable="true">`
+    let processString = ` <bpmn:process id="Process_${processRef}" isExecutable="true">`
     let diagramString = "";
     let nodeArray = [];
     let edgeArray = [];

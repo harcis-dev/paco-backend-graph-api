@@ -69,7 +69,7 @@
                 
                 let source = edgeData['sourceRef'];
                 let target = edgeData['targetRef'];
-                let id = source + "->" + target;
+                let id = source + "__to__" + target;
                 let variants = "";
                 graphDataArray.push(pushGraphEdge(id, bpmnEnum.EDGE.STANDARD_EDGE, source, target, variants));
             }
