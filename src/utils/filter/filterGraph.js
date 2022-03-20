@@ -187,7 +187,12 @@ function getEntityFrequency(
 
   for (var i = 0; i < graphJSONconcrete.length; i++) {
     let graphEntityData = graphJSONconcrete[i][graphArtefacts.DATA];
-    let graphEntityDataType = graphEntityData[graphArtefacts.TYPE];
+    let graphEntityDataType;
+    if (graphEntityData.hasOwnProperty(graphArtefacts.TYPE)) {
+      graphEntityDataType = graphEntityData[graphArtefacts.TYPE];
+    }else{
+      continue;
+    }
     let graphEntityDataID = graphEntityData[graphArtefacts.ID];
     let dataEntityVariants = Object.keys(
       graphEntityData[graphArtefacts.VARIANTS]

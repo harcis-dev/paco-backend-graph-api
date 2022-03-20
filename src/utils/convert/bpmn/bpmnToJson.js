@@ -33,7 +33,10 @@
          // Put start into graph
          if('bpmn:startEvent' in graphDataProcess){
             let variants = "";
-            graphDataArray.push(pushGraphNode('Start', bpmnEnum.NODE.INTERMEDIATE, parent, "", variants));    
+            if('bpmn:documentation' in graphDataProcess['bpmn:startEvent']){
+               variants = JSON.parse(graphDataProcess['bpmn:startEvent']['bpmn:documentation']);
+            }
+            graphDataArray.unshift(pushGraphNode('Start', bpmnEnum.NODE.INTERMEDIATE, parent, "", variants['variants']));    
          }
 
          // put tasks into graph
@@ -43,7 +46,10 @@
                 let id = graphTaskData['id'];
                 let name = graphTaskData['name'];
                 let variants = "";
-                graphDataArray.push(pushGraphNode(id, bpmnEnum.NODE.GENERIC_TASK, parent, name, variants));
+                if('bpmn:documentation' in graphTaskData){
+                    variants = JSON.parse(graphTaskData['bpmn:documentation']);
+                 }
+                graphDataArray.push(pushGraphNode(id, bpmnEnum.NODE.GENERIC_TASK, parent, name, variants['variants']));
             }
          }
 
@@ -53,13 +59,19 @@
             for(graphXorData of exclusiveGatewayArray){
                 let id = graphXorData['id'];
                 let variants = "";
-                graphDataArray.push(pushGraphNode(id, bpmnEnum.OPERATOR.EXCLUSIVE, parent, "", variants));
+                if('bpmn:documentation' in graphXorData){
+                    variants = JSON.parse(graphXorData['bpmn:documentation']);
+                 }
+                graphDataArray.push(pushGraphNode(id, bpmnEnum.OPERATOR.EXCLUSIVE, parent, "", variants['variants']));
             }
         }
 
         if('bpmn:endEvent' in graphDataProcess){
             let variants = "";
-            graphDataArray.push(pushGraphNode('Ende', bpmnEnum.NODE.END, parent, "", variants));    
+            if('bpmn:documentation' in graphDataProcess['bpmn:endEvent']){
+                variants = JSON.parse(graphDataProcess['bpmn:endEvent']['bpmn:documentation']);
+             }
+            graphDataArray.push(pushGraphNode('Ende', bpmnEnum.NODE.END, parent, "", variants['variants']));    
          }
 
                  // put exlusive gateways into graph
@@ -71,7 +83,10 @@
                 let target = edgeData['targetRef'];
                 let id = source + "__to__" + target;
                 let variants = "";
-                graphDataArray.push(pushGraphEdge(id, bpmnEnum.EDGE.STANDARD_EDGE, source, target, variants));
+                if('bpmn:documentation' in edgeData){
+                    variants = JSON.parse(edgeData['bpmn:documentation']);
+                 }
+                graphDataArray.push(pushGraphEdge(id, bpmnEnum.EDGE.STANDARD_EDGE, source, target, variants['variants']));
             }
         }
 
