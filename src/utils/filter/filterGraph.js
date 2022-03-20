@@ -170,7 +170,7 @@ function getEntityFrequency(
    */
   let isOperatorIrrelevant = !isSequenceEmpty || variantsReq.length == 1;
   /**
-   * If all variants are present, filtering of operators is skipped.
+   * Check start, if all variants are present, filtering of operators is skipped.
    */
   let areAllVariantsRepresented =
     variantsReq.length == 0 ||

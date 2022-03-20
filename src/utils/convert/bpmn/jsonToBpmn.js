@@ -126,7 +126,7 @@ const logger = require('../../log/log.js');
     }
 }
 
- function createBpmnNodes(nodeArray, edgeArray){
+function createBpmnNodes(nodeArray, edgeArray){
     let processString = "";
     /*
         <bpmn:task id="A_erstellen" name="A erstellen">
@@ -146,6 +146,12 @@ const logger = require('../../log/log.js');
             elementString += `<bpmn:${bpmnType} id="${id}" name="${label}">`;
             
         }
+        if('variants' in nodeElement){
+            let variantsObject = {};
+            let variants = nodeElement['variants'];
+            variantsObject['variants'] = variants;
+            elementString += "<bpmn:documentation>" + JSON.stringify(variantsObject) + "</bpmn:documentation>";
+        }
         for(edgeElement of edgeArray){   
             if(edgeElement['source'] == id){
                 elementString += `<bpmn:outgoing>${edgeElement['id']}</bpmn:outgoing>`
@@ -163,7 +169,15 @@ const logger = require('../../log/log.js');
         let id = edgeElement['id'];
         let source = edgeElement['source'];
         let target = edgeElement['target'];
-        processString += `<bpmn:sequenceFlow id="${id}" sourceRef="${source}" targetRef="${target}"/>`
+        if('variants' in nodeElement){
+            let variantsObject = {};
+            let variants = edgeElement['variants'];
+            variantsObject['variants'] = variants;
+            processString += `<bpmn:sequenceFlow id="${id}" sourceRef="${source}" targetRef="${target}"><bpmn:documentation>${JSON.stringify(variantsObject)}</bpmn:documentation></bpmn:sequenceFlow>`;
+        }else{
+            processString += `<bpmn:sequenceFlow id="${id}" sourceRef="${source}" targetRef="${target}"/>`
+        }
+        
     }
 
     return processString;
