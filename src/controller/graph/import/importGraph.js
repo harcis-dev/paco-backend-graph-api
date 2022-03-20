@@ -13,6 +13,7 @@ const jsonUtils = require("../../../utils/jsonUtils.js");
 const logger = require('../../../utils/log/log.js');
 const convertGraphmlToJson = require("../../../utils/convert/dfg/graphmlToJson.js");
 const convertEpmlToJson = require("../../../utils/convert/epc/epmlToJson.js");
+const convertBpmnToJson = require("../../../utils/convert/bpmn/BpmnToJson.js");
 const { ObjectId } = require('mongodb');
 
 /**
@@ -39,7 +40,8 @@ function importGraph(request, response) {
             graphJson = convertEpmlToJson(request["body"]["epc"]);
             break;
         case "bpmn":
-            //graphJson = convertGraphml2Json(request["body"]["bpmn"]);
+            graphJson = convertBpmnToJson(request["body"]["bpmn"]);
+            response.send(graphJson);
             break;
     }
     query = {

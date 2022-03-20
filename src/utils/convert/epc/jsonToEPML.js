@@ -59,12 +59,12 @@ function convertJsonToEpml(_id, name, epc) {
 }
 
 const epmlHead = `<?xml version="1.0" encoding="UTF-8"?>
-<epml:epml xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:epc="org.bflow.toolbox.epc"
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.1/notation"
-           xmlns:epml="http://www.epml.de"
-           xmlns:xmi="http://www.omg.org/XMI">
-   <coordinates xOrigin="leftToRight" yOrigin="topToBottom"/>`
+            <epml:epml xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:epc="org.bflow.toolbox.epc"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.1/notation"
+            xmlns:epml="http://www.epml.de"
+            xmlns:xmi="http://www.omg.org/XMI">
+            <coordinates xOrigin="leftToRight" yOrigin="topToBottom"/>`
 
 const epmlFoot = `</epc> </directory> </epml:epml>`
 

@@ -30,6 +30,7 @@ const importGraph = require('../controller/graph/import/importGraph.js');
 // #### Export
 const exportDfgAsGraphml = require('../controller/graph/export/dfgAsGraphml.js');
 const exportEpcAsEpml = require('../controller/graph/export/epcAsEpml.js');
+const exportBpmnJsonAsBpmn = require('../controller/graph/export/bpmnJsonAsBpmn.js');
 
 // ### CSV
 
@@ -80,14 +81,18 @@ function setAppRouter(appRouter) {
     // ## Export    
     appRouter.post('/download/dfg/:_id', exportDfgAsGraphml);
     appRouter.post('/download/epc/:_id', exportEpcAsEpml);
+    appRouter.post('/download/bpmn/:_id', exportBpmnJsonAsBpmn);
 
     // # CSV
+
     // ## CRUD
     appRouter.get('/csv/ids', csvIds);
     appRouter.delete('/csv/:_id', csvDelete);
     appRouter.post('/csv/preview/:_id', csvPreview);
+
     // ## Import
     appRouter.post('/csv/import', upload.single('file'), csvImport);
+    
     // ## Export
     appRouter.get('/csv/download/:_id', csvExport);
 
