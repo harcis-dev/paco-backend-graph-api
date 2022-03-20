@@ -1,5 +1,5 @@
 /**
- * @file Export epc json
+ * @file Export bpmn
  * @author HARCIS-DEV TEAM
  */
 
@@ -12,12 +12,11 @@
  
  /**
   * Looking for the given @param {String} _id in database and converts to
-  * a xml-based graphml file.
-  * @see convertDFG2Graphml
+  * a xml-based bpmn file.
+  * @see convertBpmnJson2Bpmn
   * @param {*} request 
   * @param {*} response 
   */
- 
  function exportBpmnJsonAsBpmn(request, response) {
      if (!request["params"].hasOwnProperty('_id')) {
          return response.status(400).send("Error: Requestbody must contain _id");
@@ -43,9 +42,8 @@
          logger.debug(`findOne: ${result}`);
          try {
              let _id = result["_id"]
-             let name = result["name"]
              result = filterVariants(result, variants, "")
-             response.send(convertBpmnJson2Bpmn(_id, name, result));
+             response.send(convertBpmnJson2Bpmn(_id, result));
          } catch (error) {
              logger.error(`${error}`);
              return response.status(500).send(`${error}`);
