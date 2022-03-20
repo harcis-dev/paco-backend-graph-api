@@ -41,7 +41,7 @@ function importGraph(request, response) {
             break;
         case "bpmn":
             graphJson = convertBpmnToJson(request["body"]["bpmn"]);
-            response.send(graphJson);
+            // Debug: response.send(graphJson);
             break;
     }
     query = {
