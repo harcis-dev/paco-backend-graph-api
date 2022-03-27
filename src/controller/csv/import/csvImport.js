@@ -3,7 +3,6 @@
  * @author HARCIS-DEV TEAM
  */
 
-const jsonUtils = require("../../../utils/jsonUtils.js");
 const logger = require('../../../utils/log/log.js');
 const axios = require("axios");
 const FormData = require("form-data");
@@ -95,6 +94,11 @@ function csvImport(request, response) {
     });
 }
 
+/**
+ * 
+ * @param {String} path 
+ * @returns 
+ */
 function sendCSVtoGraphApi(path){
     const url = process.env.GRAPH_URL || "http://localhost:5000/graphs";
     const form_data = new FormData();

@@ -467,6 +467,14 @@ function getEntityFrequency(
       }
 
       graphJSONconcrete.push(newEdge);
+      for(let checkOperatorsCounter = 0; checkOperatorsCounter < array.length; checkOperatorsCounter++){
+        let operatorId = array[checkOperatorsCounter][0];
+        if(operatorId == source || operatorId == target){
+          let tempArray = array[checkOperatorsCounter][1]["edgeArray"];
+          tempArray.push(newEdge);
+          array[checkOperatorsCounter][1]["edgeArray"] = tempArray;
+        }
+      }
       array.splice(counter3, 1);
       if (edgeElement["opToOp"]) {
         for (let ii = 0; ii < array.length; ii++) {
@@ -495,7 +503,9 @@ function getEntityFrequency(
             let febuob = graphJSONconcrete.findIndex(
               (y) => y.data.id === operatorID
             );
-            graphJSONconcrete.splice(febuob, 1);
+            if(febuob > -1){
+              graphJSONconcrete.splice(febuob, 1);
+            }   
           }
         }
       }
@@ -564,11 +574,12 @@ function isOperatorEPC(type) {
   if (!type) {
     return false;
   }
-  return Object.values(epcEnum.OPERATOR)
+  return type.toUpperCase() == epcEnum.OPERATOR.XOR;
+/*  return Object.values(epcEnum.OPERATOR)
     .map(function (e) {
       return e.toLowerCase();
     })
-    .includes(type.toLowerCase());
+    .includes(type.toLowerCase());*/
 }
 
 /**
