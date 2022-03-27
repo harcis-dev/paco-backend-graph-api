@@ -66,6 +66,7 @@ function convertBpmnJson2Bpmn(_id, bpmn) {
 }
 
 /**
+ * get bounds for bmpn element
  * 
  * @param {String} type bpmn type
  * @returns 
@@ -102,7 +103,7 @@ function getBpmnXmlType(type) {
   }
 }
 /**
- * Create shaped for bpmn graph
+ * Create shapes for bpmn graph
  * 
  * @param {Array} edgeArray 
  * @param {Array} nodeArray 

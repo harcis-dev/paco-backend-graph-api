@@ -4,6 +4,7 @@
  */
 
 const jsonUtils = require("../jsonUtils.js");
+const dataStructureUtils = require("../dataStructureUtils.js");
 const nodeEnv = process.env.NODE_ENV || "development";
 const logger = require("../log/log.js");
 const globalParameter = require("../../global/global.js");
@@ -19,11 +20,17 @@ const environment = globalParameter.environment;
  * @param {Object} graphJSON - complete graph
  * @param {Array} variantsReq - Array of given variants to filter
  * @param {String} sequenceReq - on sequence to filter
- * @param {Array} graphTypesRequest - Request for the required graphs
- * @param {Number} nodes - Filter graph by the number of nodes
+ * @param {Array} graphTypesRequest - Request for the required graph types
+ * @param {Number} nodes - Filter graph by the number of nodes in percent
  * @returns {Object} graphJSON - processed graph
  */
-function filterGraph(graphJSON, variantsReq, sequenceReq, graphTypesRequest, nodes) {
+function filterGraph(
+  graphJSON,
+  variantsReq,
+  sequenceReq,
+  graphTypesRequest,
+  nodes
+) {
   if (typeof graphTypesRequest === "undefined" || graphTypesRequest === null) {
     graphTypesRequest = Object.values(globalParameter.graphTypeEnum);
   }
@@ -43,14 +50,19 @@ function filterGraph(graphJSON, variantsReq, sequenceReq, graphTypesRequest, nod
     if (!graphTypesRequest.includes(graphType)) {
       delete graphJSON[graphType];
     } else if (graphJSON.hasOwnProperty(graphType)) {
-      if((typeof nodes === "number" || nodes instanceof Number) && nodes >= 0){
+      if (
+        (typeof nodes === "number" || nodes instanceof Number) &&
+        nodes >= 0
+      ) {
         let variants =
-        graphJSON[graphType][graphArtefacts.GRAPH][0][graphArtefacts.DATA][
-              graphArtefacts.VARIANTS
-            ];
-        variantsReq = getVariantsFromNodes(variants, nodes);
+          graphJSON[graphType][graphArtefacts.GRAPH][0][graphArtefacts.DATA][
+            graphArtefacts.VARIANTS
+          ];
+        if (typeof variants !== "undefined" && variants) {
+          variantsReq = getVariantsFromNodes(variants, nodes);
+        }
       }
-    
+
       filterConreteGraph(
         graphJSON[graphType][graphArtefacts.GRAPH],
         variantsReq,
@@ -81,6 +93,7 @@ function filterConreteGraph(
     )
   ) {
     /** No variants and sequences availible to filter */
+    setDataEdgeWidth(graphJSONconcrete);
     return;
   }
   let isSequenceEmpty = jsonUtils.isEmptyObject(sequenceReq);
@@ -125,7 +138,7 @@ function filterConreteGraph(
 }
 
 /**
- * Determine the frequency of every entity, if @param {String} sequenceReq is empty and add the frequency to entities,
+ * Determine the frequency of every entity, if `sequenceReq` is empty and add the frequency to entities,
  * else label every entity with existing Node-ID
  * @param {Object} graphJSONconcrete
  * @param {Object} frequencyMap
@@ -133,6 +146,7 @@ function filterConreteGraph(
  * @param {Boolean} isReqEmpty
  * @param {Boolean} isSequenceEmpty
  * @param {String} sequenceReq
+ * @param {String} graphType 
  * @returns {Object} parameters, for edgewidth handling
  */
 function getEntityFrequency(
@@ -174,7 +188,7 @@ function getEntityFrequency(
    */
   let areAllVariantsRepresented =
     variantsReq.length == 0 ||
-    variantsReq.length ==
+    variantsReq.length >=
       graphJSONconcrete[0][graphArtefacts.DATA][graphArtefacts.VARIANTS].length;
   /**
    * Contains ID of the operator, as well as the index in the graph
@@ -190,7 +204,7 @@ function getEntityFrequency(
     let graphEntityDataType;
     if (graphEntityData.hasOwnProperty(graphArtefacts.TYPE)) {
       graphEntityDataType = graphEntityData[graphArtefacts.TYPE];
-    }else{
+    } else {
       continue;
     }
     let graphEntityDataID = graphEntityData[graphArtefacts.ID];
@@ -407,10 +421,10 @@ function getEntityFrequency(
           source = edgeElement[graphArtefacts.SOURCE];
         }
         // Delete unused edges
-        let febuob = graphJSONconcrete.findIndex(
+        let edgeId = graphJSONconcrete.findIndex(
           (y) => y.data.id === edgeElement["edgeID"]
         );
-        graphJSONconcrete.splice(febuob, 1);
+        graphJSONconcrete.splice(edgeId, 1);
         substractIndex++;
       }
 
@@ -421,8 +435,8 @@ function getEntityFrequency(
         )[1]
       );
       // delete unused operator
-      let febuob = graphJSONconcrete.findIndex((y) => y.data.id === operator);
-      graphJSONconcrete.splice(febuob, 1);
+      let operatorId = graphJSONconcrete.findIndex((y) => y.data.id === operator);
+      graphJSONconcrete.splice(operatorId, 1);
       substractIndex++;
       newEgdeID = `${source}->${target}`;
       let newEdge = {};
@@ -456,18 +470,16 @@ function getEntityFrequency(
       array.splice(counter3, 1);
       if (edgeElement["opToOp"]) {
         for (let ii = 0; ii < array.length; ii++) {
-          let edgeArrayB = array[ii][1]['edgeArray']
-          for(let jj = 0; jj < array.length; jj++){
-            if(edgeArrayB[jj]['source'] === operator){
-              array[ii][1]['edgeArray'][jj]['source'] = source;
-              array[ii][1]['edgeArray'][jj]['edgeID'] = newEgdeID;
-
+          let edgeArrayB = array[ii][1]["edgeArray"];
+          for (let jj = 0; jj < array.length; jj++) {
+            if (edgeArrayB[jj]["source"] === operator) {
+              array[ii][1]["edgeArray"][jj]["source"] = source;
+              array[ii][1]["edgeArray"][jj]["edgeID"] = newEgdeID;
             }
           }
         }
       }
 
-      
       for (let j = 0; j < array.length; j++) {
         // let operatorJ = array[j][0];
         let edgeObjectJ = array[j][1];
@@ -630,6 +642,15 @@ function setGraphEdgeWidth(graphJSONconcrete, spacingWidthArray) {
   }
 }
 
+function setDataEdgeWidth(graphJSONconcrete) {
+  for (var i = 0; i < graphJSONconcrete.length; i++) {
+    let graphData = graphJSONconcrete[i][graphArtefacts.DATA];
+    if (graphData.hasOwnProperty(graphArtefacts.TARGET)) {    // Is edge
+          graphData["width"] = 1;    
+    }
+  }
+}
+
 /**
  * Check if Label is the start or end node
  * @param {String} graphDataLabel
@@ -727,38 +748,49 @@ function labelSequenceID(graphData, variant, sequenceReq) {
   }
 }
 
-function getVariantsFromNodes(variants, nodes){
-  let nodesToDelete = 1 - nodes;
+/**
+ * deleting variants via the transferred percentage
+ *
+ * @param {Array} variants variants available in the graph
+ * @param {Number} remainingPercentage percentage of deleted variants
+ * @returns {Array} variants deleted after the percentage
+ */
+function getVariantsFromNodes(variants, remainingPercentage) {
+  let nodesToDelete = 1 - remainingPercentage;
   let frequencyMap = {};
   let deleteCount = 0;
   variantsCount = Object.keys(variants).length;
   frequencyMap = getFrequencyMap(variants);
 
-  if(nodesToDelete <= 0){
-    nodesToDelete = 0.01
-  }else if(nodesToDelete > 1){
-    nodesToDelete = 1
+  if (nodesToDelete <= 0) {
+    nodesToDelete = 0.01;
+  } else if (nodesToDelete > 1) {
+    nodesToDelete = 1;
   }
 
   deleteCount = Math.ceil(nodesToDelete * variantsCount) - 1;
 
-  let variantsFilteredByNodes = sortFrequencyMapByDeleteCount(frequencyMap, deleteCount);
+  let variantsFilteredByNodes = sortFrequencyMapByDeleteCount(
+    frequencyMap,
+    deleteCount
+  );
 
   return variantsFilteredByNodes;
 }
 
 /**
- * Sort a map by value
- * @param {Map} map map to sort
- * @returns {Map} sorted map
+ * Sorts a map in descending order by the deleteCount and returns the remaining key values 
+ * @param {Map} frequencyMap map to sort
+ * @param {Number} deleteCount Counter of the values to be deleted
+ * @returns {Map} remaining key values
  */
- function sortFrequencyMapByDeleteCount(frequencyMap, deleteCount) { 
+function sortFrequencyMapByDeleteCount(frequencyMap, deleteCount) {
   let tupleArray;
-  let sortedMap; 
+  let sortedMap;
 
-  tupleArray = jsonUtils.generateTupleArrayFromMap(frequencyMap);
-  tupleArray.splice((variantsCount - deleteCount), deleteCount);
-  sortedMap = jsonUtils.generateMapFromTupleArray(tupleArray);
+  tupleArray = dataStructureUtils.generateTupleArrayFromMap(frequencyMap);
+  tupleArray.splice(variantsCount - deleteCount, deleteCount);
+  sortedMap = dataStructureUtils.generateMapFromTupleArray(tupleArray);
   return Object.keys(sortedMap);
 }
 

@@ -24,26 +24,7 @@ function getKeyFromJsonString(stringValue, key) {
     return objectValue[key];
 }
 
-function generateTupleArrayFromMap(map){
-    var tupleArray = [];
-    for (var key in map) tupleArray.push([key, map[key]]);
-    tupleArray.sort(function (a, b) {
-        return b[1] - a[1]
-    });
-    return tupleArray;
-}
-
-function generateMapFromTupleArray(tupleArray){
-    var sortedMap = {};
-    tupleArray.forEach(function (el) {
-        sortedMap[el[0]] = el[1]
-    });
-    return sortedMap;
-}
-
 module.exports = {
     isEmptyObject: isEmptyObject,
     getKeyFromJsonString: getKeyFromJsonString,
-    generateTupleArrayFromMap: generateTupleArrayFromMap,
-    generateMapFromTupleArray: generateMapFromTupleArray
 };

@@ -12,7 +12,7 @@ const graphArtefacts = globalParameter.graphArtefacts;
  * @param {object} graphList - All objects from database
  * @returns {Array} graph meta data
  */
-function getIdsNamesAndVariantCounts(graphList) {
+function getIdVariantCounts(graphList) {
   let idVariantsCount = [];
   for (let currentGraph of graphList) {
     let id = currentGraph["_id"];
@@ -60,4 +60,4 @@ function getIdsNamesAndVariantCounts(graphList) {
   return idVariantsCount;
 }
 
-module.exports = getIdsNamesAndVariantCounts;
+module.exports = getIdVariantCounts;
