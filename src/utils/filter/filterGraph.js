@@ -432,6 +432,9 @@ function getEntityFrequency(
           "\n"
         )[1]
       );
+      if(!operatorSum){
+        operatorSum = operatorProperties[graphArtefacts.DATA]["sum"];
+      }
       // delete unused operator
       let operatorId = graphJSONconcrete.findIndex((y) => y.data.id === operator);
       graphJSONconcrete.splice(operatorId, 1);
