@@ -4,7 +4,7 @@
  */
 
 const parser = require("xml2json");
-const globalParameter = require("../../../global/global.js");
+const globalParameter = require("../../../global/globals.js");
 
 const graphTypeEnum = globalParameter.graphTypeEnum;
 const bpmnEnum = globalParameter.bpmnEnum;
@@ -126,7 +126,7 @@ function convertBpmn2Json(dfgXML) {
       }
     }
 
-    // put exlusive sequenceFlows into graph
+    // put exclusive sequenceFlows into graph
     if ("bpmn:sequenceFlow" in graphDataProcess) {
       let edgeArray = graphData["bpmn:process"]["bpmn:sequenceFlow"];
       for (edgeData of edgeArray) {

@@ -10,7 +10,7 @@ const filterGraph = require("../../../utils/filter/filterGraph.js");
 
 const logger = require("../../../utils/log/log.js");
 
-const globalParameter = require("../../../global/global.js");
+const globalParameter = require("../../../global/globals.js");
 
 /**
  * Request for an graph with the given ID in MongoDB

@@ -3,7 +3,7 @@
  * @author HARCIS-DEV TEAM
  */
 
-const globalParameter = require("../../global/global.js");
+const globalParameter = require("../../global/globals.js");
 const graphTypeEnum = globalParameter.graphTypeEnum;
 const graphArtefacts = globalParameter.graphArtefacts;
 

@@ -16,6 +16,7 @@
  * @return
  */
  function csvPreview(request, response) {
+     /** Specification of the passed standard length */
     let rowCounter = 100;
     let query = {
         "_id": mongoose.Types.ObjectId(request["params"]["_id"])

@@ -1,5 +1,5 @@
 /**
- * @file // TODO
+ * @file store CSVs and forward them to the graph interface
  * @author HARCIS-DEV TEAM
  */
 
@@ -13,7 +13,7 @@ const mongodb = require('../../../database/mongodb.js')
 
 
 /**
- * // TODO
+ * Accept the sent CSV file, save it to the database and send the data to the graph interface.
  * 
  * https://medium.com/@svibhuti22/file-upload-with-multer-in-node-js-and-express-5bc76073419f
  */
@@ -35,8 +35,8 @@ function csvImport(request, response) {
     const rows = data.split('\n');
 
     let headerColumns = rows[0].split(',');
-    for (let i = 0; i < headerColumns.length; i++) {
-        headerColumns[i] = headerColumns[i].trim().replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+    for (let columnCounter = 0; columnCounter < headerColumns.length; columnCounter++) {
+        headerColumns[columnCounter] = headerColumns[columnCounter].trim().replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
     }
 
     if(!headerColumns.includes('caseid')){

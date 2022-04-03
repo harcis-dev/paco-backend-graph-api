@@ -7,7 +7,7 @@ const jsonUtils = require("../jsonUtils.js");
 const dataStructureUtils = require("../dataStructureUtils.js");
 const nodeEnv = process.env.NODE_ENV || "development";
 const logger = require("../log/log.js");
-const globalParameter = require("../../global/global.js");
+const globalParameter = require("../../global/globals.js");
 
 const graphTypeEnum = globalParameter.graphTypeEnum;
 const epcEnum = globalParameter.epcEnum;
@@ -113,7 +113,7 @@ function filterConreteGraph(
     }
   }
   /** Iterate trough graph data. Use the filters, if available */
-  sum = getEntityFrequency(
+  let entityFrequency = getEntityFrequency(
     graphJSONconcrete,
     frequencyMap,
     variantsReq,
@@ -125,9 +125,9 @@ function filterConreteGraph(
 
   if (isSeqEmpty) {
     /** If empty, add edgewidth on edges */
-    let smallestSum = sum["smallestSum"];
-    let biggestSum = sum["biggestSum"];
-    let frequencyEdgeWidth = sum["frequencyEdgeWidth"];
+    let smallestSum = entityFrequency["smallestSum"];
+    let biggestSum = entityFrequency["biggestSum"];
+    let frequencyEdgeWidth = entityFrequency["frequencyEdgeWidth"];
     let spacingWidthArray = getSpacingWidth(
       smallestSum,
       biggestSum,
@@ -249,32 +249,32 @@ function getEntityFrequency(
           graphEntityData.hasOwnProperty(graphArtefacts.SOURCE) &&
           graphEntityData.hasOwnProperty(graphArtefacts.TARGET)
         ) {
-          let source = graphEntityData[graphArtefacts.SOURCE];
-          let target = graphEntityData[graphArtefacts.TARGET];
+          let sourceTemp = graphEntityData[graphArtefacts.SOURCE];
+          let targetTemp = graphEntityData[graphArtefacts.TARGET];
 
           if (
-            deletedOperatorIds.includes(source) &&
-            deletedOperatorIds.includes(target)
+            deletedOperatorIds.includes(sourceTemp) &&
+            deletedOperatorIds.includes(targetTemp)
           ) {
             markedTargetNodes.push({
-              i: elementCounter,
-              source: source,
-              target: target,
+              elementCounter: elementCounter,
+              source: sourceTemp,
+              target: targetTemp,
               opToOp: true,
             });
-          } else if (deletedOperatorIds.includes(source)) {
+          } else if (deletedOperatorIds.includes(sourceTemp)) {
             markedTargetNodes.push({
-              i: elementCounter,
-              source: source,
-              target: target,
+              elementCounter: elementCounter,
+              source: sourceTemp,
+              target: targetTemp,
               opToOp: false,
             });
-          } else if (deletedOperatorIds.includes(target)) {
+          } else if (deletedOperatorIds.includes(targetTemp)) {
             graphJSONconcrete.splice(elementCounter, 1);
             elementCounter--;
             markedSourceNodes.push({
-              source: source,
-              target: target,
+              source: sourceTemp,
+              target: targetTemp,
               opToOp: false,
             });
           }
@@ -372,7 +372,7 @@ function getEntityFrequency(
         /** The element is a node  */
         newLine = "\n";
       }
-
+      // note biggest and smallest sum for arrow widths
       if (
         sum > biggestSum &&
         !isStartOrEndNode(graphEntityData[graphArtefacts.LABEL])
@@ -402,8 +402,7 @@ function getEntityFrequency(
    */
   let markedOperatorsArray = Object.entries(markedOperatorsMap);
 
-  let markedOperatorsCounter;
-  for (markedOperatorsCounter = 0; markedOperatorsCounter < markedOperatorsArray.length; markedOperatorsCounter++) {
+  for (let markedOperatorsCounter = 0; markedOperatorsCounter < markedOperatorsArray.length; markedOperatorsCounter++) {
     let operator = markedOperatorsArray[markedOperatorsCounter][0];
     let edgeObject = markedOperatorsArray[markedOperatorsCounter][1];
     let edgeArray = edgeObject["edgeArray"];
@@ -476,7 +475,7 @@ function getEntityFrequency(
           
           let newElement = {
             edgeID: newEgdeID,
-            edgeIndex: graphJSONconcrete.length-1,
+            edgeIndex: graphJSONconcrete.length,
             source: source,
             target: target
           };
@@ -486,6 +485,7 @@ function getEntityFrequency(
         }
       }
       markedOperatorsArray.splice(markedOperatorsCounter, 1);
+      // Insert subsequent elements of the operators into the editing sequence.
       if (edgeElement["opToOp"]) {
         for (let ii = 0; ii < markedOperatorsArray.length; ii++) {
           let edgeArrayB = markedOperatorsArray[ii][1]["edgeArray"];
@@ -499,7 +499,6 @@ function getEntityFrequency(
       }
 
       for (let j = 0; j < markedOperatorsArray.length; j++) {
-        // let operatorJ = array[j][0]; TODO
         let edgeObjectJ = markedOperatorsArray[j][1];
         let edgeArrayJ = edgeObjectJ["edgeArray"];
         for (let k = 0; k < edgeArrayJ.length; k++) {
@@ -510,11 +509,11 @@ function getEntityFrequency(
             let operatorID = edgeArrayJ[k]["edgeID"];
             edgeArrayJ.splice(k, 1);
             markedOperatorsArray[j][1]["edgeArray"] = edgeArrayJ;
-            let febuob = graphJSONconcrete.findIndex(
-              (y) => y.data.id === operatorID
+            let elementIndex = graphJSONconcrete.findIndex(
+              (element) => element.data.id === operatorID
             );
-            if(febuob > -1){
-              graphJSONconcrete.splice(febuob, 1);
+            if(elementIndex > -1){
+              graphJSONconcrete.splice(elementIndex, 1);
             }   
           }
         }
@@ -536,7 +535,7 @@ function getEntityFrequency(
     for (let targetCounter = 0; targetCounter < markedTargetNodes.length; targetCounter++) {
       let source = markedTargetNodes[targetCounter][graphArtefacts.SOURCE];
       if (source == target) {
-        let index = markedTargetNodes[targetCounter]["i"];
+        let index = markedTargetNodes[targetCounter]["elementCounter"];
         if (markedTargetNodes[targetCounter]["opToOp"]) {
           opToOpEdge.push(index);
           let sourceTemp = markedTargetNodes[targetCounter][graphArtefacts.TARGET];

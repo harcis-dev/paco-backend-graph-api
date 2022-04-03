@@ -30,7 +30,6 @@
              return response.status(400).send("Error: No graph in database with provided _id");
          }
          let variants = [];
-         let sequence = "";
          if (error) {
              logger.error(`${error}`);
              return response.status(500).send(error);

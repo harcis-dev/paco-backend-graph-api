@@ -3,7 +3,7 @@
  * @author HARCIS-DEV TEAM
  */
 
-const { bpmnEnum } = require("../../../global/global.js");
+const { bpmnEnum } = require("../../../global/globals.js");
 const logger = require("../../log/log.js");
 
 /**
