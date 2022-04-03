@@ -96,15 +96,15 @@ function filterConreteGraph(
     setDataEdgeWidth(graphJSONconcrete);
     return;
   }
-  let isSequenceEmpty = jsonUtils.isEmptyObject(sequenceReq);
+  let isSeqEmpty = jsonUtils.isEmptyObject(sequenceReq);
   /** Check if Request is empty -> do not filter  */
-  let isReqEmpty = jsonUtils.isEmptyObject(variantsReq) && isSequenceEmpty;
+  let isReqEmpty = jsonUtils.isEmptyObject(variantsReq) && isSeqEmpty;
   let frequencyMap = {};
   let variantsGraphMap =
     graphJSONconcrete[0][graphArtefacts.DATA][graphArtefacts.VARIANTS];
 
   /** if Sequence is availible add Node-ID to Label, otherwise get frequency */
-  if (isSequenceEmpty) {
+  if (isSeqEmpty) {
     frequencyMap = getFrequencyMap(variantsGraphMap);
   } else {
     variantsReq = getVariantFromSequence(sequenceReq, variantsGraphMap);
@@ -118,12 +118,12 @@ function filterConreteGraph(
     frequencyMap,
     variantsReq,
     isReqEmpty,
-    isSequenceEmpty,
+    isSeqEmpty,
     sequenceReq,
     graphType
   );
 
-  if (isSequenceEmpty) {
+  if (isSeqEmpty) {
     /** If empty, add edgewidth on edges */
     let smallestSum = sum["smallestSum"];
     let biggestSum = sum["biggestSum"];
@@ -174,11 +174,11 @@ function getEntityFrequency(
   /**
    * Marked places of the origin nodes
    */
-  let markedIndexSource = [];
+  let markedSourceNodes = [];
   /**
    * Marked locations of the target nodes
    */
-  let markedIndexTarget = [];
+  let markedTargetNodes = [];
   /**
    * With only one variant, all operators are deleted.
    */
@@ -199,8 +199,8 @@ function getEntityFrequency(
    */
   let markedOperatorsMap = {};
 
-  for (var i = 0; i < graphJSONconcrete.length; i++) {
-    let graphEntityData = graphJSONconcrete[i][graphArtefacts.DATA];
+  for (let elementCounter = 0; elementCounter < graphJSONconcrete.length; elementCounter++) {
+    let graphEntityData = graphJSONconcrete[elementCounter][graphArtefacts.DATA];
     let graphEntityDataType;
     if (graphEntityData.hasOwnProperty(graphArtefacts.TYPE)) {
       graphEntityDataType = graphEntityData[graphArtefacts.TYPE];
@@ -222,8 +222,8 @@ function getEntityFrequency(
     if (!areAllVariantsRepresented) {
       /** Filter for variants. Delete data if not requested */
       if (!checkArrayItem(dataEntityVariants, variantsReq) && !isReqEmpty) {
-        graphJSONconcrete.splice(i, 1);
-        i--;
+        graphJSONconcrete.splice(elementCounter, 1);
+        elementCounter--;
         continue;
       }
 
@@ -240,8 +240,8 @@ function getEntityFrequency(
           isOperatorBPMN(graphEntityDataType)
         ) {
           deletedOperatorIds.push(graphEntityDataID);
-          graphJSONconcrete.splice(i, 1);
-          i--;
+          graphJSONconcrete.splice(elementCounter, 1);
+          elementCounter--;
           continue;
         }
 
@@ -256,23 +256,23 @@ function getEntityFrequency(
             deletedOperatorIds.includes(source) &&
             deletedOperatorIds.includes(target)
           ) {
-            markedIndexTarget.push({
-              i: i,
+            markedTargetNodes.push({
+              i: elementCounter,
               source: source,
               target: target,
               opToOp: true,
             });
           } else if (deletedOperatorIds.includes(source)) {
-            markedIndexTarget.push({
-              i: i,
+            markedTargetNodes.push({
+              i: elementCounter,
               source: source,
               target: target,
               opToOp: false,
             });
           } else if (deletedOperatorIds.includes(target)) {
-            graphJSONconcrete.splice(i, 1);
-            i--;
-            markedIndexSource.push({
+            graphJSONconcrete.splice(elementCounter, 1);
+            elementCounter--;
+            markedSourceNodes.push({
               source: source,
               target: target,
               opToOp: false,
@@ -292,7 +292,7 @@ function getEntityFrequency(
           isOperatorEPC(graphEntityDataType) ||
           isOperatorBPMN(graphEntityDataType)
         ) {
-          markedOperatorsIndexMap[graphEntityDataID] = i;
+          markedOperatorsIndexMap[graphEntityDataID] = elementCounter;
         } else if (
           isInformationFlowEPC(graphEntityDataType) ||
           isStandardEdgeBPMN(graphEntityDataType)
@@ -326,7 +326,7 @@ function getEntityFrequency(
             for (operatorID of operatorIDs) {
               let edgeElement = {
                 edgeID: graphEntityDataID,
-                edgeIndex: i,
+                edgeIndex: elementCounter,
                 source: graphEntityDataSource,
                 target: graphEntityDataTarget,
                 opToOp: opToOp,
@@ -392,7 +392,7 @@ function getEntityFrequency(
       labelSequenceID(graphEntityData, variantsReq, sequenceReq);
     }
     if (nodeEnv === environment.PRODUCTION) {
-      delete graphJSONconcrete[i][graphArtefacts.DATA][graphArtefacts.VARIANTS];
+      delete graphJSONconcrete[elementCounter][graphArtefacts.DATA][graphArtefacts.VARIANTS];
     }
   }
 
@@ -400,12 +400,12 @@ function getEntityFrequency(
    * Check if the existing operators still need to be used or if they
    * can be deleted due to simple origin and destination edges.
    */
-  let array = Object.entries(markedOperatorsMap);
+  let markedOperatorsArray = Object.entries(markedOperatorsMap);
 
-  let counter3;
-  for (counter3 = 0; counter3 < array.length; counter3++) {
-    let operator = array[counter3][0];
-    let edgeObject = array[counter3][1];
+  let markedOperatorsCounter;
+  for (markedOperatorsCounter = 0; markedOperatorsCounter < markedOperatorsArray.length; markedOperatorsCounter++) {
+    let operator = markedOperatorsArray[markedOperatorsCounter][0];
+    let edgeObject = markedOperatorsArray[markedOperatorsCounter][1];
     let edgeArray = edgeObject["edgeArray"];
 
     if (edgeArray.length == 2) {
@@ -466,10 +466,10 @@ function getEntityFrequency(
 
       graphJSONconcrete.push(newEdge);
       // Iterate through the operators and add the new edge
-      for(let checkOperatorsCounter = 0; checkOperatorsCounter < array.length; checkOperatorsCounter++){
-        let operatorId = array[checkOperatorsCounter][0];
+      for(let checkOperatorsCounter = 0; checkOperatorsCounter < markedOperatorsArray.length; checkOperatorsCounter++){
+        let operatorId = markedOperatorsArray[checkOperatorsCounter][0];
         if(operatorId == source || operatorId == target){
-          let tempArray = array[checkOperatorsCounter][1]["edgeArray"];
+          let tempArray = markedOperatorsArray[checkOperatorsCounter][1]["edgeArray"];
           
           let newElement = {
             edgeID: newEgdeID,
@@ -479,25 +479,25 @@ function getEntityFrequency(
           };
           tempArray.push(newElement);
           // Replaced the respective array for the operator with the newly added node
-          array[checkOperatorsCounter][1]["edgeArray"] = tempArray;
+          markedOperatorsArray[checkOperatorsCounter][1]["edgeArray"] = tempArray;
         }
       }
-      array.splice(counter3, 1);
+      markedOperatorsArray.splice(markedOperatorsCounter, 1);
       if (edgeElement["opToOp"]) {
-        for (let ii = 0; ii < array.length; ii++) {
-          let edgeArrayB = array[ii][1]["edgeArray"];
-          for (let jj = 0; jj < array.length; jj++) {
+        for (let ii = 0; ii < markedOperatorsArray.length; ii++) {
+          let edgeArrayB = markedOperatorsArray[ii][1]["edgeArray"];
+          for (let jj = 0; jj < markedOperatorsArray.length; jj++) {
             if (edgeArrayB[jj]["source"] === operator) {
-              array[ii][1]["edgeArray"][jj]["source"] = source;
-              array[ii][1]["edgeArray"][jj]["edgeID"] = newEgdeID;
+              markedOperatorsArray[ii][1]["edgeArray"][jj]["source"] = source;
+              markedOperatorsArray[ii][1]["edgeArray"][jj]["edgeID"] = newEgdeID;
             }
           }
         }
       }
 
-      for (let j = 0; j < array.length; j++) {
+      for (let j = 0; j < markedOperatorsArray.length; j++) {
         // let operatorJ = array[j][0]; TODO
-        let edgeObjectJ = array[j][1];
+        let edgeObjectJ = markedOperatorsArray[j][1];
         let edgeArrayJ = edgeObjectJ["edgeArray"];
         for (let k = 0; k < edgeArrayJ.length; k++) {
           if (
@@ -506,7 +506,7 @@ function getEntityFrequency(
           ) {
             let operatorID = edgeArrayJ[k]["edgeID"];
             edgeArrayJ.splice(k, 1);
-            array[j][1]["edgeArray"] = edgeArrayJ;
+            markedOperatorsArray[j][1]["edgeArray"] = edgeArrayJ;
             let febuob = graphJSONconcrete.findIndex(
               (y) => y.data.id === operatorID
             );
@@ -516,7 +516,7 @@ function getEntityFrequency(
           }
         }
       }
-      counter3 = -1;
+      markedOperatorsCounter = -1;
     }
   }
 
@@ -528,21 +528,21 @@ function getEntityFrequency(
   /**
    * Overwrite the origin nodes in the edges, depending on the deleted operators.
    */
-  for (let i = 0; i < markedIndexSource.length; i++) {
-    let target = markedIndexSource[i][graphArtefacts.TARGET];
-    for (let j = 0; j < markedIndexTarget.length; j++) {
-      let source = markedIndexTarget[j][graphArtefacts.SOURCE];
+  for (let sourceCounter = 0; sourceCounter < markedSourceNodes.length; sourceCounter++) {
+    let target = markedSourceNodes[sourceCounter][graphArtefacts.TARGET];
+    for (let targetCounter = 0; targetCounter < markedTargetNodes.length; targetCounter++) {
+      let source = markedTargetNodes[targetCounter][graphArtefacts.SOURCE];
       if (source == target) {
-        let index = markedIndexTarget[j]["i"];
-        if (markedIndexTarget[j]["opToOp"]) {
+        let index = markedTargetNodes[targetCounter]["i"];
+        if (markedTargetNodes[targetCounter]["opToOp"]) {
           opToOpEdge.push(index);
-          let sourceTemp = markedIndexTarget[j][graphArtefacts.TARGET];
-          for (let k = 0; k < markedIndexTarget.length; k++) {
-            let targetTemp = markedIndexTarget[k][graphArtefacts.SOURCE];
+          let sourceTemp = markedTargetNodes[targetCounter][graphArtefacts.TARGET];
+          for (let markedOpToOpCounter = 0; markedOpToOpCounter < markedTargetNodes.length; markedOpToOpCounter++) {
+            let targetTemp = markedTargetNodes[markedOpToOpCounter][graphArtefacts.SOURCE];
             if (sourceTemp == targetTemp) {
               target = sourceTemp;
-              j = 0;
-              k = markedIndexTarget.length;
+              targetCounter = 0;
+              markedOpToOpCounter = markedTargetNodes.length;
               break;
             }
           }
@@ -551,7 +551,7 @@ function getEntityFrequency(
         }
 
         graphJSONconcrete[index][graphArtefacts.DATA][graphArtefacts.SOURCE] =
-          markedIndexSource[i][graphArtefacts.SOURCE];
+          markedSourceNodes[sourceCounter][graphArtefacts.SOURCE];
         break;
       }
     }
